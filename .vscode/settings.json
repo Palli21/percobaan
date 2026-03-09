@@ -1,0 +1,30 @@
+{
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -Xlog:disable",
+    "java.project.sourcePaths": [
+        "anjunganmandiriSEP/src",
+        "KhanzaAntrianApotek/src",
+        "KhanzaAntrianLoket/src",
+        "KhanzaAntrianLoket2/src",
+        "KhanzaAntrianPoli/src",
+        "KhanzaAPMRSJ/src",
+        "KhanzaCetakAntrianLoket/src",
+        "KhanzaHMSAnjungan/src",
+        "KhanzaHMSAnjunganFingerPrint/src",
+        "KhanzaHMSAutoVerify/src",
+        "KhanzaHMSAutoVerify2/src",
+        "KhanzaHMSResume/src",
+        "KhanzaHMSServiceAplicare/src",
+        "KhanzaHMSServiceMobileJKN/src",
+        "KhanzaHMSServiceMobileJKNERM/src",
+        "KhanzaHMSServiceMobileJKNERMJuni2024/src",
+        "KhanzaHMSServiceMobileJKNERMLogTaskId/src",
+        "KhanzaHMSServicePCare/src",
+        "KhanzaHMSServiceSatuSehat/src",
+        "KhanzaHMSServiceSIRSYankes/src",
+        "KhanzaPengenkripsiTeks/src",
+        "KhanzaSecurity16bit/src",
+        "KhanzaUpdater/src",
+        "src"
+    ],
+    "java.project.referencedLibraries": []
+}

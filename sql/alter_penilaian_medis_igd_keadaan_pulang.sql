@@ -1,0 +1,21 @@
+-- Tambahan kolom kondisi pulang (sesuai blok Keadaan Saat Pulang)
+ALTER TABLE penilaian_medis_igd
+    ADD COLUMN keadaan_sembuh    ENUM('Ya','Tidak') NOT NULL DEFAULT 'Tidak' AFTER rawat_inap_ke,
+    ADD COLUMN sembuh_td         VARCHAR(8)    NOT NULL DEFAULT '' AFTER keadaan_sembuh,
+    ADD COLUMN sembuh_nadi       VARCHAR(5)    NOT NULL DEFAULT '' AFTER sembuh_td,
+    ADD COLUMN sembuh_rr         VARCHAR(5)    NOT NULL DEFAULT '' AFTER sembuh_nadi,
+    ADD COLUMN sembuh_suhu       VARCHAR(5)    NOT NULL DEFAULT '' AFTER sembuh_rr,
+    ADD COLUMN sembuh_kesadaran  VARCHAR(100)  NOT NULL DEFAULT '' AFTER sembuh_suhu,
+    ADD COLUMN keadaan_membaik   ENUM('Ya','Tidak') NOT NULL DEFAULT 'Tidak' AFTER sembuh_kesadaran,
+    ADD COLUMN membaik_td        VARCHAR(8)    NOT NULL DEFAULT '' AFTER keadaan_membaik,
+    ADD COLUMN membaik_nadi      VARCHAR(5)    NOT NULL DEFAULT '' AFTER membaik_td,
+    ADD COLUMN membaik_rr        VARCHAR(5)    NOT NULL DEFAULT '' AFTER membaik_nadi,
+    ADD COLUMN membaik_suhu      VARCHAR(5)    NOT NULL DEFAULT '' AFTER membaik_rr,
+    ADD COLUMN membaik_kesadaran VARCHAR(100)  NOT NULL DEFAULT '' AFTER membaik_suhu,
+    ADD COLUMN perawatan_lanjut  ENUM('Ya','Tidak') NOT NULL DEFAULT 'Tidak' AFTER membaik_kesadaran,
+    ADD COLUMN lanjut_td         VARCHAR(8)    NOT NULL DEFAULT '' AFTER perawatan_lanjut,
+    ADD COLUMN lanjut_nadi       VARCHAR(5)    NOT NULL DEFAULT '' AFTER lanjut_td,
+    ADD COLUMN lanjut_rr         VARCHAR(5)    NOT NULL DEFAULT '' AFTER lanjut_nadi,
+    ADD COLUMN lanjut_suhu       VARCHAR(5)    NOT NULL DEFAULT '' AFTER lanjut_rr,
+    ADD COLUMN lanjut_kesadaran  VARCHAR(100)  NOT NULL DEFAULT '' AFTER lanjut_suhu,
+    ADD COLUMN meninggal         ENUM('Ya','Tidak') NOT NULL DEFAULT 'Tidak' AFTER lanjut_kesadaran;

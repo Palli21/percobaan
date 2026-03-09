@@ -1,0 +1,45 @@
+/build/
+/dist/
+/KhanzaHMSServiceMobileJKNERMLogTaskId/build/
+/KhanzaHMSServiceMobileJKNERMLogTaskId/dist/
+/KhanzaHMSServiceMobileJKNERMLogTaskId/nbproject/private/
+/KhanzaHMSServiceMobileJKNERMJuni2024/build/
+/KhanzaHMSServiceMobileJKNERMJuni2024/dist/
+/KhanzaHMSServiceMobileJKNERMJuni2024/nbproject/private/
+dist.zip
+/nbproject/private/
+/KhanzaHMSServiceMobileJKNERM/nbproject/private/
+/KhanzaHMSServiceMobileJKNERM/dist/
+# Large/binary artifacts
+*.zip
+*.jar
+*.mp4
+*.avi
+*.mov
+
+# Common build outputs
+dist/
+build/
+target/
+bin/
+out/
+
+# Large/binary artifacts
+*.zip
+*.jar
+*.mp4
+*.avi
+*.mov
+
+# Build outputs
+dist/
+build/
+target/
+bin/
+out/
+
+# Large/binary artifacts (do not commit)
+*.zip
+*.jar
+*.mp4
+*.exe

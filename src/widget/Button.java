@@ -1,0 +1,27 @@
+package widget;
+
+import java.awt.Color;
+import java.awt.Insets;
+
+public class Button extends usu.widget.ButtonGlass {
+
+    private static final long serialVersionUID = 1L;
+
+    public Button() {
+        super();
+        setFont(new java.awt.Font("Liberation Sans", 1, 11));
+        setForeground(new Color(50, 50, 50));
+        setGlassColor(new Color(245, 240, 240));
+        setMargin(new Insets(2, 7, 2, 7));
+        setIconTextGap(4);
+        setRoundRect(true);
+
+        // Tambahkan radius jika didukung
+        try {
+            java.lang.reflect.Method setRound = this.getClass().getMethod("setRound", int.class);
+            setRound.invoke(this, 10); // ubah radius sesuai kebutuhan
+        } catch (Exception e) {
+            // Jika metode tidak ada, tidak masalah
+        }
+    }
+}
