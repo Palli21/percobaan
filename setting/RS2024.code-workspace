@@ -7,6 +7,9 @@
 		{
 			"name": "bridging_apotek",
 			"path": "../../bridging_apotek"
+		},
+		{
+			"path": "../../../../../var/www/html/etiket"
 		}
 	],
 	"settings": {
@@ -14,6 +17,6 @@
 		"powerquery.client.additionalSymbolsDirectories": [
 			"/home/pallicks/Simrs/RS2024/.vscode/excel-pq-symbols"
 		],
-		"liveServer.settings.multiRootWorkspaceName": "edokter"
+		"liveServer.settings.multiRootWorkspaceName": "etiket"
 	}
 }

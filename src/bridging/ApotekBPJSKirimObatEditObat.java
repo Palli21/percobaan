@@ -2038,9 +2038,9 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
                                 while(rsobat.next()){
                                     if (rsobat.getString("jml").equals("60")) {
                                         tabModeDetailObatRacikan.addRow(new Object[] {rsracikan.getString("no_racik"),rsobat.getString("jml"),rsobat.getString("kode_brng"),rsobat.getString("nama_brng"),2,1}); 
-                                    } else if (rs2.getString("jml").equals("90")) {
+                                    } else if (rsobat.getString("jml").equals("90")) {
                                         tabModeDetailObatRacikan.addRow(new Object[] {rsracikan.getString("no_racik"),rsobat.getString("jml"),rsobat.getString("kode_brng"),rsobat.getString("nama_brng"),3,1}); 
-                                    } else if (rs2.getString("jml").equals("120")) {
+                                    } else if (rsobat.getString("jml").equals("120")) {
                                         tabModeDetailObatRacikan.addRow(new Object[] {rsracikan.getString("no_racik"),rsobat.getString("jml"),rsobat.getString("kode_brng"),rsobat.getString("nama_brng"),4,1}); 
                                     } else {
                                         tabModeDetailObatRacikan.addRow(new Object[] {rsracikan.getString("no_racik"),rsobat.getString("jml"),rsobat.getString("kode_brng"),rsobat.getString("nama_brng"),1,1}); 
@@ -2049,11 +2049,11 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
                             } catch (Exception e) {
                                 System.out.println("Notifikasi Detail Racikan : "+e);
                             } finally{
-                                if(rs2!=null){
-                                    rs2.close();
+                                if(rsobat!=null){
+                                    rsobat.close();
                                 }
-                                if(ps2!=null){
-                                    ps2.close();
+                                if(psobat!=null){
+                                    psobat.close();
                                 }
                             }
                         }
@@ -2074,6 +2074,13 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
                 }
             } catch (Exception e) {
                  System.out.println("Notifikasi racikan : "+e);
+            } finally{
+                if(rs2!=null){
+                    rs2.close();
+                }
+                if(ps2!=null){
+                    ps2.close();
+                }
             }
             
         } catch (Exception e) {

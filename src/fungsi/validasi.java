@@ -285,6 +285,21 @@ public final class validasi {
         }
     }
 
+    public void autoNomer7(String noUrutSaatIni, String strAwal, Integer pnj, javax.swing.JTextField teks) {
+        try {
+            s = Integer.toString(Integer.parseInt(noUrutSaatIni) + 1);
+        } catch (Exception e) {
+            s = "1";
+        }
+
+        j = s.length();
+        s1 = "";
+        for (i = 1; i <= pnj - j; i++) {
+            s1 = s1 + "0";
+        }
+        teks.setText(strAwal + s1 + s);
+    }
+
     public String autoNomer(String tabel, String strAwal, Integer pnj) {
         try {
             auto = "";

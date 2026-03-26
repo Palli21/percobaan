@@ -33,6 +33,7 @@ import org.springframework.http.MediaType;
 
 public class BPJSMonitoringKlaim extends javax.swing.JDialog {
     private final DefaultTableModel tabMode;
+    private final Map<String,double[]> komponenBiayaCache=new HashMap<>();
     private sekuel Sequel=new sekuel();
     private validasi Valid=new validasi();
     private Connection koneksi=koneksiDB.condb();
@@ -69,7 +70,8 @@ public class BPJSMonitoringKlaim extends javax.swing.JDialog {
                 "Lokasi Laka Lantas", "User Input","Tgl.Lahir","Peserta",
                 "J.Kel","No.Kartu","Tanggal Pulang","Asal Rujukan","Eksekutif",
                 "COB","Penjamin","No.Telp","INACBG","Status","No.FPK","Pengajuan",
-                "Disetujui","Tarif Gruper","Tarif RS","Topup","Untung/Rugi"
+                "Disetujui","Tarif Gruper","Tarif RS","Topup","Untung/Rugi",
+                "Obat","Tindakan","Radiologi","Lab","Operasi","Kode DPJP","Nama DPJP"
             }){
               @Override public boolean isCellEditable(int rowIndex, int colIndex){return false;}
         };
@@ -79,7 +81,7 @@ public class BPJSMonitoringKlaim extends javax.swing.JDialog {
         tbDokter.setPreferredScrollableViewportSize(new Dimension(500,500));
         tbDokter.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        for (i = 0; i < 40; i++) {
+        for (i = 0; i < 47; i++) {
             TableColumn column = tbDokter.getColumnModel().getColumn(i);
             if(i==0){
                 column.setPreferredWidth(125);
@@ -139,6 +141,10 @@ public class BPJSMonitoringKlaim extends javax.swing.JDialog {
                 column.setMaxWidth(0);
             }else if(i==25){
                 column.setPreferredWidth(120);
+            }else if(i==46){
+                column.setPreferredWidth(220);
+            }else if(i>=40){
+                column.setPreferredWidth(100);
             }else{
                 column.setPreferredWidth(150);
             }
@@ -888,6 +894,7 @@ private void KdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TKdKey
 
     public void tampil() {        
         Valid.tabelKosong(tabMode);
+        komponenBiayaCache.clear();
         try{
             ps=koneksi.prepareStatement(
                    "select DISTINCT bridging_sep.tglsep as tanggal from bridging_sep where "+
@@ -1007,6 +1014,56 @@ private void KdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TKdKey
         return data==null?"":data;
     }
 
+    private double[] ambilKomponenBiaya(String noRawat){
+        if(komponenBiayaCache.containsKey(noRawat)){
+            return komponenBiayaCache.get(noRawat);
+        }
+
+        double[] biaya=new double[]{0,0,0,0,0};
+        if(noRawat.trim().equals("")){
+            komponenBiayaCache.put(noRawat,biaya);
+            return biaya;
+        }
+
+        try(PreparedStatement psbiaya=koneksi.prepareStatement(
+                "select "+
+                "ifnull((select sum(detail_pemberian_obat.total) from detail_pemberian_obat where detail_pemberian_obat.no_rawat=parameter.no_rawat),0)+"+
+                "ifnull((select sum(tagihan_obat_langsung.besar_tagihan) from tagihan_obat_langsung where tagihan_obat_langsung.no_rawat=parameter.no_rawat),0)+"+
+                "ifnull((select sum(beri_obat_operasi.hargasatuan*beri_obat_operasi.jumlah) from beri_obat_operasi where beri_obat_operasi.no_rawat=parameter.no_rawat),0) as obat, "+
+                "ifnull((select sum(rawat_jl_dr.biaya_rawat) from rawat_jl_dr where rawat_jl_dr.no_rawat=parameter.no_rawat),0)+"+
+                "ifnull((select sum(rawat_jl_pr.biaya_rawat) from rawat_jl_pr where rawat_jl_pr.no_rawat=parameter.no_rawat),0)+"+
+                "ifnull((select sum(rawat_jl_drpr.biaya_rawat) from rawat_jl_drpr where rawat_jl_drpr.no_rawat=parameter.no_rawat),0)+"+
+                "ifnull((select sum(rawat_inap_dr.biaya_rawat) from rawat_inap_dr where rawat_inap_dr.no_rawat=parameter.no_rawat),0)+"+
+                "ifnull((select sum(rawat_inap_pr.biaya_rawat) from rawat_inap_pr where rawat_inap_pr.no_rawat=parameter.no_rawat),0)+"+
+                "ifnull((select sum(rawat_inap_drpr.biaya_rawat) from rawat_inap_drpr where rawat_inap_drpr.no_rawat=parameter.no_rawat),0) as tindakan, "+
+                "ifnull((select sum(periksa_radiologi.biaya) from periksa_radiologi where periksa_radiologi.no_rawat=parameter.no_rawat),0) as radiologi, "+
+                "ifnull((select sum(periksa_lab.biaya) from periksa_lab where periksa_lab.no_rawat=parameter.no_rawat),0)+"+
+                "ifnull((select sum(detail_periksa_lab.biaya_item) from detail_periksa_lab where detail_periksa_lab.no_rawat=parameter.no_rawat),0) as lab, "+
+                "ifnull((select sum(operasi.biayaoperator1+operasi.biayaoperator2+operasi.biayaoperator3+operasi.biayaasisten_operator1+operasi.biayaasisten_operator2+operasi.biayaasisten_operator3+"+
+                "operasi.biayainstrumen+operasi.biayadokter_anak+operasi.biayaperawaat_resusitas+operasi.biayadokter_anestesi+operasi.biayaasisten_anestesi+operasi.biayaasisten_anestesi2+"+
+                "operasi.biayabidan+operasi.biayabidan2+operasi.biayabidan3+operasi.biayaperawat_luar+operasi.biayaalat+operasi.biayasewaok+operasi.akomodasi+operasi.bagian_rs+"+
+                "operasi.biaya_omloop+operasi.biaya_omloop2+operasi.biaya_omloop3+operasi.biaya_omloop4+operasi.biaya_omloop5+operasi.biayasarpras+operasi.biaya_dokter_pjanak+"+
+                "operasi.biaya_dokter_umum) from operasi where operasi.no_rawat=parameter.no_rawat),0) as operasi "+
+                "from (select ? as no_rawat) parameter"
+            )){
+            psbiaya.setString(1,noRawat);
+            try(ResultSet rsbiaya=psbiaya.executeQuery()){
+                if(rsbiaya.next()){
+                    biaya[0]=rsbiaya.getDouble("obat");
+                    biaya[1]=rsbiaya.getDouble("tindakan");
+                    biaya[2]=rsbiaya.getDouble("radiologi");
+                    biaya[3]=rsbiaya.getDouble("lab");
+                    biaya[4]=rsbiaya.getDouble("operasi");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Notif Komponen Biaya : "+e);
+        }
+
+        komponenBiayaCache.put(noRawat,biaya);
+        return biaya;
+    }
+
     private boolean sesuaiFilter(ResultSet data,JsonNode list) throws Exception{
         if(!KdPpkRujukan.getText().trim().equals("") &&
                 !KdPpkRujukan.getText().trim().equalsIgnoreCase(nilai(data.getString("kdppkrujukan")))){
@@ -1044,6 +1101,8 @@ private void KdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TKdKey
                     nilai(data.getString("nmdiagnosaawal"))+" "+
                     nilai(data.getString("kdpolitujuan"))+" "+
                     nilai(data.getString("nmpolitujuan"))+" "+
+                    nilai(data.getString("kddpjp"))+" "+
+                    nilai(data.getString("nmdpdjp"))+" "+
                     nilai(data.getString("no_kartu"))+" "+
                     nilai(data.getString("pembiayaan"))+" "+
                     nilai(data.getString("notelep"))+" "+
@@ -1060,6 +1119,7 @@ private void KdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TKdKey
 
     private void tambahDataKlaim(ResultSet data,JsonNode list) throws Exception{
         String no_sep = nilai(data.getString("no_sep"));
+        double[] komponenBiaya=ambilKomponenBiaya(nilai(data.getString("no_rawat")));
         
         // Mencegah duplicate data di tabel antarmuka jika no_sep sudah ada (biasanya karena bentrok SEP dan SEP Internal)
         for(int i = 0; i < tabMode.getRowCount(); i++) {
@@ -1090,7 +1150,14 @@ private void KdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TKdKey
             Valid.SetAngka(tarifGruper),
             Valid.SetAngka(tarifRS),
             Valid.SetAngka(topup),
-            Valid.SetAngka(disetujui-topup-tarifRS)
+            Valid.SetAngka(disetujui-topup-tarifRS),
+            Valid.SetAngka(komponenBiaya[0]),
+            Valid.SetAngka(komponenBiaya[1]),
+            Valid.SetAngka(komponenBiaya[2]),
+            Valid.SetAngka(komponenBiaya[3]),
+            Valid.SetAngka(komponenBiaya[4]),
+            nilai(data.getString("kddpjp")),
+            nilai(data.getString("nmdpdjp"))
         });
     }
     
@@ -1118,7 +1185,7 @@ private void KdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TKdKey
                         pssep=koneksi.prepareStatement(
                             "select no_sep,no_rawat,nomr,nama_pasien,tglsep,tglrujukan,no_rujukan,kdppkrujukan,nmppkrujukan,kdppkpelayanan,nmppkpelayanan,"+
                             "jnspelayanan,catatan,diagawal,nmdiagnosaawal,kdpolitujuan,nmpolitujuan,klsrawat,lakalantas,keterangankkl,user,tanggal_lahir,peserta,jkel,no_kartu,"+
-                            "tglpulang,asal_rujukan,eksekutif,cob,pembiayaan,notelep from bridging_sep where no_sep=?");
+                            "tglpulang,asal_rujukan,eksekutif,cob,pembiayaan,notelep,kddpjp,nmdpdjp from bridging_sep where no_sep=?");
                         try {
                             pssep.setString(1,list.path("noSEP").asText());
                             rssep=pssep.executeQuery();
@@ -1175,7 +1242,7 @@ private void KdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TKdKey
                         pssep=koneksi.prepareStatement(
                             "select no_sep,no_rawat,nomr,nama_pasien,tglsep,tglrujukan,no_rujukan,kdppkrujukan,nmppkrujukan,kdppkpelayanan,nmppkpelayanan,"+
                             "jnspelayanan,catatan,diagawal,nmdiagnosaawal,kdpolitujuan,nmpolitujuan,klsrawat,lakalantas,keterangankkl,user,tanggal_lahir,peserta,jkel,no_kartu,"+
-                            "tglpulang,asal_rujukan,eksekutif,cob,pembiayaan,notelep from bridging_sep_internal where no_sep=?");
+                            "tglpulang,asal_rujukan,eksekutif,cob,pembiayaan,notelep,kddpjp,nmdpdjp from bridging_sep_internal where no_sep=?");
                         try {
                             pssep.setString(1,list.path("noSEP").asText());
                             rssep=pssep.executeQuery();

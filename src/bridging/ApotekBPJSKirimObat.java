@@ -1735,6 +1735,13 @@ private void BtnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                                 }                                
                             } catch (Exception e) {
                                 System.out.println("Notifikasi Detail Racikan : "+e);
+                            } finally{
+                                if(rsobat!=null){
+                                    rsobat.close();
+                                }
+                                if(psobat!=null){
+                                    psobat.close();
+                                }
                             }
                         }
                     } catch (Exception e) {
@@ -1758,8 +1765,8 @@ private void BtnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 if(rs2!=null){
                     rs2.close();
                 }
-                if(rs2!=null){
-                    rs2.close();
+                if(ps2!=null){
+                    ps2.close();
                 }
             }
             

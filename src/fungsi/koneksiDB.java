@@ -37,6 +37,15 @@ public class koneksiDB {
             prop.loadFromXML(fis);
         }
     }
+    
+    private static boolean kemungkinanNilaiTerenkripsi(String nilai){
+        if(nilai == null){
+            return false;
+        }
+        nilai = nilai.trim();
+        return (!nilai.equals("")) && (nilai.length() % 4 == 0) && nilai.matches("^[A-Za-z0-9+/=]+$");
+    }
+    
     public static Connection condb(){ 
         if(connection == null){
             try{
@@ -715,9 +724,42 @@ public class koneksiDB {
     public static String JADIKANPIUTANGAPOTEKBPJS(){
         try{
             loadProps();
-            var=EnkripsiAES.decrypt(prop.getProperty("JADIKANPIUTANGAPOTEKBPJS"));
+            var=prop.getProperty("JADIKANPIUTANGAPOTEKBPJS");
+            if(var==null){
+                var="no";
+            }else{
+                if(kemungkinanNilaiTerenkripsi(var)){
+                    String hasilDekripsi=EnkripsiAES.decrypt(var);
+                    if((hasilDekripsi!=null)&&(!hasilDekripsi.trim().equals(""))){
+                        var=hasilDekripsi;
+                    }
+                }
+                if(var.trim().equals("")){
+                    var="no";
+                }
+            }
         }catch(Exception e){
             var="no"; 
+        }
+        return var;
+    }
+
+    public static String KODEPPKAPOTEKBPJS(){
+        try{
+            loadProps();
+            var=prop.getProperty("KODEPPKAPOTEKBPJS");
+            if(var==null){
+                var="";
+            }else{
+                if(kemungkinanNilaiTerenkripsi(var)){
+                    String hasilDekripsi=EnkripsiAES.decrypt(var);
+                    if((hasilDekripsi!=null)&&(!hasilDekripsi.trim().equals(""))){
+                        var=hasilDekripsi;
+                    }
+                }
+            }
+        }catch(Exception e){
+            var="";
         }
         return var;
     }

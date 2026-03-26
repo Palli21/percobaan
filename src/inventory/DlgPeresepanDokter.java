@@ -80,31 +80,17 @@ public final class DlgPeresepanDokter extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         // ==== Panel Riwayat Obat - sisi kanan ====
-        LoadHTMLRiwayatObat = new widget.editorpane();
-        ScrollRiwayatObat = new widget.ScrollPane();
-
-        LoadHTMLRiwayatObat.setBorder(null);
-        LoadHTMLRiwayatObat.setEditable(false);
-
-// Gunakan HTMLEditorKit + StyleSheet seperti di RMRiwayatPerawatan
+        final int lebarPanelRiwayatObat = 420;
         javax.swing.text.html.HTMLEditorKit kitObat = new javax.swing.text.html.HTMLEditorKit();
         javax.swing.text.html.StyleSheet styleObat = kitObat.getStyleSheet();
-        styleObat.addRule(".isi td{border-right:1px solid #e2e7dd;font: 8.5px tahoma;height:12px;"
-                + "border-bottom:1px solid #e2e7dd;background:#ffffff;color:#323232;}"
+        styleObat.addRule("body{margin:0;padding:0;font-family:Tahoma;}"
+                + "table{table-layout:fixed;width:100%;border-collapse:collapse;}"
+                + ".isi td{border-right:1px solid #e2e7dd;font:8.5px tahoma;"
+                + "border-bottom:1px solid #e2e7dd;background:#ffffff;color:#323232;"
+                + "vertical-align:top;word-wrap:break-word;padding:4px 3px;}"
                 + ".isi a{text-decoration:none;color:#8b9b95;padding:0;font-family:Tahoma;"
                 + "font-size:8.5px;border:white;}");
 
-        LoadHTMLRiwayatObat.setEditorKit(kitObat);
-        LoadHTMLRiwayatObat.setDocument(kitObat.createDefaultDocument());
-
-        ScrollRiwayatObat.setViewportView(LoadHTMLRiwayatObat);
-        ScrollRiwayatObat.setPreferredSize(new java.awt.Dimension(360, 10)); // lebar panel kanan
-
-// Pasang ke sisi kanan frame utama (BorderLayout.EAST)
-        internalFrame1.add(ScrollRiwayatObat, java.awt.BorderLayout.EAST);
-
-        kitObat = new HTMLEditorKit();
-
         LoadHTMLRiwayatObat = new widget.editorpane();
         LoadHTMLRiwayatObat.setBorder(null);
         LoadHTMLRiwayatObat.setEditable(false);
@@ -114,25 +100,8 @@ public final class DlgPeresepanDokter extends javax.swing.JDialog {
 
         ScrollRiwayatObat = new widget.ScrollPane();
         ScrollRiwayatObat.setViewportView(LoadHTMLRiwayatObat);
-        ScrollRiwayatObat.setPreferredSize(new Dimension(360, 10)); // lebar panel kanan
+        ScrollRiwayatObat.setPreferredSize(new Dimension(lebarPanelRiwayatObat, 10));
 
-// Pastikan container pakai BorderLayout
-        internalFrame1.add(ScrollRiwayatObat, BorderLayout.EAST);
-
-        kitObat = new HTMLEditorKit();
-
-        LoadHTMLRiwayatObat = new widget.editorpane();
-        LoadHTMLRiwayatObat.setBorder(null);
-        LoadHTMLRiwayatObat.setEditable(false);
-        LoadHTMLRiwayatObat.setEditorKit(kitObat);
-        LoadHTMLRiwayatObat.setDocument(kitObat.createDefaultDocument());
-        LoadHTMLRiwayatObat.setText("<html><body><i>Masukkan No. RM untuk melihat riwayat obat.</i></body></html>");
-
-        ScrollRiwayatObat = new widget.ScrollPane();
-        ScrollRiwayatObat.setViewportView(LoadHTMLRiwayatObat);
-        ScrollRiwayatObat.setPreferredSize(new Dimension(360, 10)); // lebar panel kanan
-
-// Pastikan container pakai BorderLayout
         internalFrame1.add(ScrollRiwayatObat, BorderLayout.EAST);
 
         // === Listener untuk memuat riwayat obat berdasarkan No. RM ===
@@ -4272,11 +4241,16 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
         // Ambil data riwayat pemberian obat berdasar No. RM (tanpa kode & biaya)
         String sql
-                = "SELECT dpo.tgl_perawatan, dpo.jam, db.nama_brng, dpo.jml AS jumlah "
+                = "SELECT dpo.tgl_perawatan, dpo.jam, db.nama_brng, dpo.jml AS jumlah, "
+                + "IFNULL(ap.aturan,'') AS aturan_pakai "
                 + "FROM detail_pemberian_obat dpo "
                 + "INNER JOIN reg_periksa rp ON rp.no_rawat = dpo.no_rawat "
                 + "INNER JOIN pasien p ON p.no_rkm_medis = rp.no_rkm_medis "
                 + "INNER JOIN databarang db ON db.kode_brng = dpo.kode_brng "
+                + "LEFT JOIN aturan_pakai ap ON ap.no_rawat = dpo.no_rawat "
+                + "AND ap.tgl_perawatan = dpo.tgl_perawatan "
+                + "AND ap.jam = dpo.jam "
+                + "AND ap.kode_brng = dpo.kode_brng "
                 + "WHERE p.no_rkm_medis = ? "
                 + "ORDER BY dpo.tgl_perawatan DESC, dpo.jam DESC, db.nama_brng ASC";
 
@@ -4296,6 +4270,7 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
                 String jam = rs.getString("jam");
                 String nama = rs.getString("nama_brng");
                 String jml = rs.getString("jumlah");
+                String aturanPakai = rs.getString("aturan_pakai");
 
                 // Ganti header tanggal bila berubah
                 if (!tgl.equals(tanggalSaatIni)) {
@@ -4306,15 +4281,16 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
                     tanggalSaatIni = tgl;
                     urut = 1;
                     html.append("<tr class='isi'>")
-                            .append("<td colspan='4' style='background:#f7faf7;font-weight:bold;'>")
+                            .append("<td colspan='5' style='background:#f7faf7;font-weight:bold;'>")
                             .append("TANGGAL PEMBERIAN: ").append(tgl)
                             .append("</td></tr>")
-                            .append("<tr class='isi'><td colspan='4'>")
+                            .append("<tr class='isi'><td colspan='5'>")
                             .append("<table width='100%' border='0' cellpadding='3px' cellspacing='0' class='isi'>")
                             .append("<tr>")
                             .append("<td width='5%'><b>No</b></td>")
-                            .append("<td width='20%'><b>Jam</b></td>")
-                            .append("<td width='55%'><b>Nama Obat</b></td>")
+                            .append("<td width='12%'><b>Jam</b></td>")
+                            .append("<td width='35%'><b>Nama Obat</b></td>")
+                            .append("<td width='28%'><b>Aturan Pakai</b></td>")
                             .append("<td width='20%'><b>Jumlah</b></td>")
                             .append("</tr>");
                 }
@@ -4323,6 +4299,7 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
                         .append("<td>").append(urut++).append("</td>")
                         .append("<td>").append(jam).append("</td>")
                         .append("<td>").append(nama).append("</td>")
+                        .append("<td>").append(aturanPakai).append("</td>")
                         .append("<td>").append(jml).append("</td>")
                         .append("</tr>");
             }
@@ -4330,11 +4307,11 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
             if (!tanggalSaatIni.isEmpty()) {
                 html.append("</table></td></tr>");
             } else {
-                html.append("<tr class='isi'><td colspan='4'><i>Tidak ada riwayat obat.</i></td></tr>");
+                html.append("<tr class='isi'><td colspan='5'><i>Tidak ada riwayat obat.</i></td></tr>");
             }
 
         } catch (Exception e) {
-            html.append("<tr class='isi'><td colspan='4'>Gagal memuat riwayat obat: ")
+            html.append("<tr class='isi'><td colspan='5'>Gagal memuat riwayat obat: ")
                     .append(e.getMessage()).append("</td></tr>");
         } finally {
             try {

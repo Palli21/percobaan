@@ -1585,6 +1585,16 @@ public final class sekuel {
             
         return dicari;
     }
+
+    // Wrapper kompatibilitas modul lama yang memakai penamaan method PascalCase.
+    public String CariBangsal(String kdBangsal){
+        return cariIsi("select nm_bangsal from bangsal where kd_bangsal=?",kdBangsal);
+    }
+
+    // Wrapper kompatibilitas modul lama yang memakai penamaan method PascalCase.
+    public String CariDokter(String kdDokter){
+        return cariIsi("select nm_dokter from dokter where kd_dokter=?",kdDokter);
+    }
     
     public Date cariIsi2(String sql){
         try {

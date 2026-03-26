@@ -43,7 +43,7 @@ import org.springframework.http.MediaType;
  *
  * @author dosen
  */
-public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
+public final class ApotekBPJSRekapPesertaPRB extends javax.swing.JDialog {
     private final DefaultTableModel tabMode;
     private validasi Valid=new validasi();
     private sekuel Sequel=new sekuel();
@@ -62,14 +62,16 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
     /** Creates new form DlgKamar
      * @param parent
      * @param modal */
-    public ApotekBPJSCekReferensiPoli(java.awt.Frame parent, boolean modal) {
+    public ApotekBPJSRekapPesertaPRB(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
 
         this.setLocation(10,2);
         setSize(628,674);
 
-        tabMode=new DefaultTableModel(null,new String[]{"No.","Kode Poli","Nama Poli"}){
+        tabMode=new DefaultTableModel(null,new String[]{
+                "No","Nama Peserta","Nomor Kartu","Alamat","Tanggal SRB","Diagnosa","Obat","DPJP","Asal Faskes"
+            }){
               @Override public boolean isCellEditable(int rowIndex, int colIndex){return false;}
         };
         tbKamar.setModel(tabMode);
@@ -78,26 +80,39 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
         tbKamar.setPreferredScrollableViewportSize(new Dimension(500,500));
         tbKamar.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        for (int i = 0; i < 3; i++) {
+        for (i = 0; i < 9; i++) {
             TableColumn column = tbKamar.getColumnModel().getColumn(i);
             if(i==0){
                 column.setPreferredWidth(40);
             }else if(i==1){
-                column.setPreferredWidth(140);
+                column.setPreferredWidth(160);
             }else if(i==2){
-                column.setPreferredWidth(470);
+                column.setPreferredWidth(110);
+            }else if(i==3){
+                column.setPreferredWidth(150);
+            }else if(i==4){
+                column.setPreferredWidth(120);
+            }else if(i==5){
+                column.setPreferredWidth(60);
+            }else if(i==6){
+                column.setPreferredWidth(150);
+            }else if(i==7){
+                column.setPreferredWidth(150);
+            }else if(i==8){
+                column.setPreferredWidth(150);
             }
         }
         tbKamar.setDefaultRenderer(Object.class, new WarnaTable());
         
-        Poli.setDocument(new batasInput((byte)100).getKata(Poli));
+        TCari.setDocument(new batasInput((byte)100).getKata(TCari));
         
         try {
             link=koneksiDB.URLAPIAPOTEKBPJS();
         } catch (Exception e) {
             System.out.println("E : "+e);
         }
-              
+           
+        Valid.LoadTahun(Tahun);
     }
     
     
@@ -115,8 +130,11 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
         Scroll = new widget.ScrollPane();
         tbKamar = new widget.Table();
         panelGlass6 = new widget.panelisi();
+        label11 = new widget.Label();
+        Tahun = new widget.ComboBox();
+        Bulan = new widget.ComboBox();
         jLabel16 = new widget.Label();
-        Poli = new widget.TextBox();
+        TCari = new widget.TextBox();
         BtnCari = new widget.Button();
         jLabel17 = new widget.Label();
         BtnPrint = new widget.Button();
@@ -133,7 +151,7 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
             }
         });
 
-        internalFrame1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(240, 245, 235)), "::[ Pencarian Data Referensi Poli Apotek BPJS ]::", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(50, 50, 50))); // NOI18N
+        internalFrame1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(240, 245, 235)), "::[ Rekap Peserta PRB Apotek BPJS ]::", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(50, 50, 50))); // NOI18N
         internalFrame1.setName("internalFrame1"); // NOI18N
         internalFrame1.setLayout(new java.awt.BorderLayout(1, 1));
 
@@ -150,19 +168,33 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
         panelGlass6.setPreferredSize(new java.awt.Dimension(44, 54));
         panelGlass6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 9));
 
-        jLabel16.setText("Key Word :");
+        label11.setText("Tahun & Bulan :");
+        label11.setName("label11"); // NOI18N
+        label11.setPreferredSize(new java.awt.Dimension(85, 23));
+        panelGlass6.add(label11);
+
+        Tahun.setName("Tahun"); // NOI18N
+        Tahun.setPreferredSize(new java.awt.Dimension(80, 23));
+        panelGlass6.add(Tahun);
+
+        Bulan.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        Bulan.setName("Bulan"); // NOI18N
+        Bulan.setPreferredSize(new java.awt.Dimension(62, 23));
+        panelGlass6.add(Bulan);
+
+        jLabel16.setText("Keyword :");
         jLabel16.setName("jLabel16"); // NOI18N
-        jLabel16.setPreferredSize(new java.awt.Dimension(60, 23));
+        jLabel16.setPreferredSize(new java.awt.Dimension(58, 23));
         panelGlass6.add(jLabel16);
 
-        Poli.setName("Poli"); // NOI18N
-        Poli.setPreferredSize(new java.awt.Dimension(300, 23));
-        Poli.addKeyListener(new java.awt.event.KeyAdapter() {
+        TCari.setName("TCari"); // NOI18N
+        TCari.setPreferredSize(new java.awt.Dimension(150, 23));
+        TCari.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                PoliKeyPressed(evt);
+                TCariKeyPressed(evt);
             }
         });
-        panelGlass6.add(Poli);
+        panelGlass6.add(TCari);
 
         BtnCari.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/accept.png"))); // NOI18N
         BtnCari.setMnemonic('6');
@@ -245,7 +277,13 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
                 Sequel.menyimpan("temporary","'"+r+"','"+
                                 tabMode.getValueAt(r,0).toString()+"','"+
                                 tabMode.getValueAt(r,1).toString()+"','"+
-                                tabMode.getValueAt(r,2).toString()+"','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','"+akses.getalamatip()+"'","Rekap Harian Pengadaan Ipsrs"); 
+                                tabMode.getValueAt(r,2).toString()+"','"+
+                                tabMode.getValueAt(r,3).toString()+"','"+
+                                tabMode.getValueAt(r,4).toString()+"','"+
+                                tabMode.getValueAt(r,5).toString()+"','"+
+                                tabMode.getValueAt(r,6).toString()+"','"+
+                                tabMode.getValueAt(r,7).toString()+"','"+
+                                tabMode.getValueAt(r,8).toString()+"','','','','','','','','','','','','','','','','','','','','','','','','','','','','"+akses.getalamatip()+"'","Rekap Harian Pengadaan Ipsrs"); 
             }
             
             Map<String, Object> param = new HashMap<>();                 
@@ -253,63 +291,58 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
             param.put("alamatrs",akses.getalamatrs());
             param.put("kotars",akses.getkabupatenrs());
             param.put("propinsirs",akses.getpropinsirs());
-            //param.put("peserta","No.Peserta : "+NoKartu.getText()+" Nama Peserta : "+NamaPasien.getText());
             param.put("kontakrs",akses.getkontakrs());
             param.put("emailrs",akses.getemailrs());   
             param.put("logo",Sequel.cariGambar("select setting.logo from setting")); 
-            Valid.MyReportqry("rptCariBPJSReferensiPoliApotek.jasper","report","[ Pencarian Referensi Poli Apotek BPJS ]","select * from temporary where temporary.temp37='"+akses.getalamatip()+"' order by temporary.no",param);
+            Valid.MyReportqry("rptApotekBPJSRekapPesertaPRB.jasper","report","[ Daftar Peserta Pasien PRB Apotek BPJS ]","select * from temporary where temporary.temp37='"+akses.getalamatip()+"' order by temporary.no",param);
             this.setCursor(Cursor.getDefaultCursor());
         }     
     }//GEN-LAST:event_BtnPrintActionPerformed
 
-    private void PoliKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_PoliKeyPressed
+    private void TCariKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TCariKeyPressed
         if(evt.getKeyCode()==KeyEvent.VK_ENTER){
-            runBackground(() ->tampil(Poli.getText()));
+            runBackground(() ->tampil());
             BtnPrint.requestFocus();
         }else if(evt.getKeyCode()==KeyEvent.VK_PAGE_DOWN){
-            runBackground(() ->tampil(Poli.getText()));
+            runBackground(() ->tampil());
         }else if(evt.getKeyCode()==KeyEvent.VK_PAGE_UP){
             BtnKeluar.requestFocus();
         }else if(evt.getKeyCode()==KeyEvent.VK_UP){
             BtnCariActionPerformed(null);
         }
-    }//GEN-LAST:event_PoliKeyPressed
+    }//GEN-LAST:event_TCariKeyPressed
 
     private void BtnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnCariActionPerformed
-        if(Poli.getText().trim().equals("")){
-            JOptionPane.showMessageDialog(rootPane,"Masukkan keyword terlebih dahulu...!");
-        }else{
-            runBackground(() ->tampil(Poli.getText()));
-        }
+        runBackground(() ->tampil());
     }//GEN-LAST:event_BtnCariActionPerformed
 
     private void BtnCariKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_BtnCariKeyPressed
         if(evt.getKeyCode()==KeyEvent.VK_SPACE){
             BtnCariActionPerformed(null);
         }else{
-            Valid.pindah(evt,Poli,BtnPrint);
+            Valid.pindah(evt,TCari,BtnPrint);
         }
     }//GEN-LAST:event_BtnCariKeyPressed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         if(koneksiDB.CARICEPAT().equals("aktif")){
-            Poli.getDocument().addDocumentListener(new javax.swing.event.DocumentListener(){
+            TCari.getDocument().addDocumentListener(new javax.swing.event.DocumentListener(){
                 @Override
                 public void insertUpdate(DocumentEvent e) {
-                    if(Poli.getText().length()>2){
-                        runBackground(() ->tampil(Poli.getText()));
+                    if(TCari.getText().length()>2){
+                        runBackground(() ->tampil());
                     }
                 }
                 @Override
                 public void removeUpdate(DocumentEvent e) {
-                    if(Poli.getText().length()>2){
-                        runBackground(() ->tampil(Poli.getText()));
+                    if(TCari.getText().length()>2){
+                        runBackground(() ->tampil());
                     }
                 }
                 @Override
                 public void changedUpdate(DocumentEvent e) {
-                    if(Poli.getText().length()>2){
-                        runBackground(() ->tampil(Poli.getText()));
+                    if(TCari.getText().length()>2){
+                        runBackground(() ->tampil());
                     }
                 }
             });
@@ -321,7 +354,7 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(() -> {
-            ApotekBPJSCekReferensiPoli dialog = new ApotekBPJSCekReferensiPoli(new javax.swing.JFrame(), true);
+            ApotekBPJSRekapPesertaPRB dialog = new ApotekBPJSRekapPesertaPRB(new javax.swing.JFrame(), true);
             dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
@@ -336,16 +369,19 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
     private widget.Button BtnCari;
     private widget.Button BtnKeluar;
     private widget.Button BtnPrint;
-    private widget.TextBox Poli;
+    private widget.ComboBox Bulan;
     private widget.ScrollPane Scroll;
+    private widget.TextBox TCari;
+    private widget.ComboBox Tahun;
     private widget.InternalFrame internalFrame1;
     private widget.Label jLabel16;
     private widget.Label jLabel17;
+    private widget.Label label11;
     private widget.panelisi panelGlass6;
     private widget.Table tbKamar;
     // End of variables declaration//GEN-END:variables
 
-    private void tampil(String keyword) {
+    private void tampil() {
         try {
             headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -355,21 +391,34 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
 	    headers.add("x-signature",api.getHmac(utc));
 	    headers.add("user_key",koneksiDB.USERKEYAPIAPOTEKBPJS());
             requestEntity = new HttpEntity(headers);
-            URL = link+"/referensi/poli/"+keyword;	
+            URL = link+"/Prb/rekappeserta/tahun/"+Tahun.getSelectedItem().toString()+"/bulan/"+Bulan.getSelectedItem().toString();
             System.out.println(URL);
             root = mapper.readTree(api.getRest().exchange(URL, HttpMethod.GET, requestEntity, String.class).getBody());
             nameNode = root.path("metaData");
             if(nameNode.path("code").asText().equals("200")){
                 Valid.tabelKosong(tabMode);
                 response = mapper.readTree(api.Decrypt(root.path("response").asText(),utc));
-                //response = root.path("response");
                 if(response.path("list").isArray()){
-                    i=1;
-                    for(JsonNode list:response.path("list")){
-                        tabMode.addRow(new Object[]{
-                            i+".",list.path("kode").asText(),list.path("nama").asText()
-                        });
-                        i++;
+                    if(TCari.getText().trim().equals("")){
+                        for(JsonNode list:response.path("list")){
+                            tabMode.addRow(new Object[]{
+                                list.path("No").asText(),list.path("NamaPeserta").asText(),list.path("NomorKaPst").asText(),
+                                list.path("Alamat").asText(),list.path("TglSRB").asText(),list.path("Diagnosa").asText(),
+                                list.path("Obat").asText(),list.path("DPJP").asText(),list.path("AsalFaskes").asText()
+                            });
+                        }
+                    }else{
+                        for(JsonNode list:response.path("list")){
+                            if(list.path("NamaPeserta").asText().contains(TCari.getText())||list.path("NomorKaPst").asText().contains(TCari.getText())||
+                                    list.path("DPJP").asText().contains(TCari.getText())||list.path("Diagnosa").asText().contains(TCari.getText())||
+                                    list.path("Obat").asText().contains(TCari.getText())){
+                                tabMode.addRow(new Object[]{
+                                    list.path("No").asText(),list.path("NamaPeserta").asText(),list.path("NomorKaPst").asText(),
+                                    list.path("Alamat").asText(),list.path("NomorKaPst").asText(),list.path("Diagnosa").asText(),
+                                    list.path("Obat").asText(),list.path("DPJP").asText(),list.path("AsalFaskes").asText()
+                                });
+                            }
+                        }
                     }
                 }
             }else {
