@@ -1,21 +1,14 @@
 /build/
 /dist/
+/KhanzaHMSServiceMobileJKNERM/dist/
+/KhanzaHMSServiceMobileJKNERM/nbproject/private/
 /KhanzaHMSServiceMobileJKNERMLogTaskId/build/
 /KhanzaHMSServiceMobileJKNERMLogTaskId/dist/
 /KhanzaHMSServiceMobileJKNERMLogTaskId/nbproject/private/
 /KhanzaHMSServiceMobileJKNERMJuni2024/build/
 /KhanzaHMSServiceMobileJKNERMJuni2024/dist/
 /KhanzaHMSServiceMobileJKNERMJuni2024/nbproject/private/
-dist.zip
 /nbproject/private/
-/KhanzaHMSServiceMobileJKNERM/nbproject/private/
-/KhanzaHMSServiceMobileJKNERM/dist/
-# Large/binary artifacts
-*.zip
-*.jar
-*.mp4
-*.avi
-*.mov
 
 # Common build outputs
 dist/
@@ -23,23 +16,20 @@ build/
 target/
 bin/
 out/
+dist.zip
 
-# Large/binary artifacts
+# Large/binary artifacts generated locally
 *.zip
 *.jar
 *.mp4
 *.avi
 *.mov
-
-# Build outputs
-dist/
-build/
-target/
-bin/
-out/
-
-# Large/binary artifacts (do not commit)
-*.zip
-*.jar
-*.mp4
 *.exe
+
+# Machine-specific files
+*.code-workspace
+hs_err_pid*.log
+
+# Runtime cache files
+/cache/*.iyem
+!/cache/.gitkeep
