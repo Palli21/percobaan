@@ -41,6 +41,7 @@ import bridging.ApotekBPJSCekReferensiPoli;
 import bridging.ApotekBPJSCekReferensiSettingPPK;
 import bridging.ApotekBPJSCekReferensiSpesialistik;
 import bridging.ApotekBPJSDaftarPelayananObat;
+import bridging.ApotekBPJSDaftarPermintaanResepIterasi;
 import bridging.ApotekBPJSDaftarResepObat;
 import bridging.ApotekBPJSInputResepObat;
 import bridging.ApotekBPJSKunjunganSEP;
@@ -21637,6 +21638,17 @@ isTutup();
         this.setCursor(Cursor.getDefaultCursor()); 
     } 
     
+    private void btnBPJSPermintaanResepIterasiApotekActionPerformed(java.awt.event.ActionEvent evt) {
+        isTutup();
+        DlgHome.dispose();
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        ApotekBPJSDaftarPermintaanResepIterasi form=new ApotekBPJSDaftarPermintaanResepIterasi(this,false);
+        form.setSize(PanelUtama.getWidth(), PanelUtama.getHeight());
+        form.setLocationRelativeTo(PanelUtama);
+        form.setVisible(true);
+        this.setCursor(Cursor.getDefaultCursor());
+    }
+
     private void btnCatatanPersalinanActionPerformed(java.awt.event.ActionEvent evt) {
         isTutup();
         DlgHome.dispose();
@@ -22859,7 +22871,7 @@ isTutup();
             btnPenilaianRisikoJatuhPsikiatri,btnPenilaianLanjutanSkriningFungsional,btnPenilaianAwalMedisRalanRehabMedik,btnTemplatePersetujuanPenolakanTindakan,
             btnPenilaianAwalMedisRalanIGDPsikiatri,btnBPJSReferensiSettingPPKApotek,btnBPJSReferensiObatApotek,btnPembayaranBankMandiri,btnBPJSMapingObatApotek,btnBPJSInputResepObatApotek,
             btnPenilaianUlangNyeri,btnPenilaianTerapiWicara,btnPengkajianRestrain,btnBPJSKunjunganSEPApotek,btnBPJSMonitoringKlaimApotek,btnPenilaianAwalMedisRalanParu,
-            btnBPJSDaftarPelayananObatApotek,btnBPJSDaftarResepObatApotek,btnCatatanKeperawatanRalan,btnCatatanPersalinan,btnSkorAldrettePascaAnestesi,btnSkorStewardPascaAnestesi,
+            btnBPJSDaftarPelayananObatApotek,btnBPJSDaftarResepObatApotek,btnBPJSPermintaanResepIterasiApotek,btnCatatanKeperawatanRalan,btnCatatanPersalinan,btnSkorAldrettePascaAnestesi,btnSkorStewardPascaAnestesi,
             btnSkorBromagePascaAnestesi,btnPenilaianPreInduksi,btnHasilUSGUrologi,btnHasilUSGGynecologi,btnHasilPemeriksaanEKG,btnKirimDietSatuSehat,btnMappingObatSatuSehat,
             btnRingkasanPengadaanDapur,btnKirimMedicationSatuSehat,btnKirimMedicationRequestSatuSehat,btnPenatalaksanaanTerapiOkupasi,btnKirimMedicationDispenseSatuSehat,
             btnHasilUSGNeonatus,btnHasilEndoskopiFaringLaring,btnMappingRadiologiSatuSehat,btnKirimServiceRequestRadiologiSatuSehat,btnHasilEndoskopiHidung,btnKirimSpecimenRadiologiSatuSehat,
@@ -25545,6 +25557,11 @@ isTutup();
 
             if(akses.getbpjs_daftar_pelayanan_obat_apotek()==true){
                 Panelmenu.add(btnBPJSDaftarResepObatApotek);
+                jmlmenu++;
+            }
+
+            if(akses.getbpjs_obat_23hari_apotek()==true){
+                Panelmenu.add(btnBPJSPermintaanResepIterasiApotek);
                 jmlmenu++;
             }
             
@@ -30695,6 +30712,11 @@ isTutup();
 
         if(akses.getbpjs_daftar_pelayanan_obat_apotek()==true){
             Panelmenu.add(btnBPJSDaftarResepObatApotek);
+            jmlmenu++;
+        }
+
+        if(akses.getbpjs_obat_23hari_apotek()==true){
+            Panelmenu.add(btnBPJSPermintaanResepIterasiApotek);
             jmlmenu++;
         }
         
@@ -36848,6 +36870,13 @@ isTutup();
         if(akses.getbpjs_daftar_pelayanan_obat_apotek()==true){
             if(btnBPJSDaftarResepObatApotek.getText().toLowerCase().trim().contains(TCari.getText().toLowerCase().trim())){
                 Panelmenu.add(btnBPJSDaftarResepObatApotek);
+                jmlmenu++;
+            }                
+        }
+
+        if(akses.getbpjs_obat_23hari_apotek()==true){
+            if(btnBPJSPermintaanResepIterasiApotek.getText().toLowerCase().trim().contains(TCari.getText().toLowerCase().trim())){
+                Panelmenu.add(btnBPJSPermintaanResepIterasiApotek);
                 jmlmenu++;
             }                
         }
@@ -44661,6 +44690,14 @@ isTutup();
         btnBPJSDaftarResepObatApotek.setName("btnBPJSDaftarResepObatApotek"); 
         btnBPJSDaftarResepObatApotek.setPreferredSize(new java.awt.Dimension(200, 90));
         btnBPJSDaftarResepObatApotek.addActionListener(this::btnBPJSDaftarResepObatApotekActionPerformed);
+
+        btnBPJSPermintaanResepIterasiApotek = new widget.ButtonBig();
+        btnBPJSPermintaanResepIterasiApotek.setIcon(new javax.swing.ImageIcon(getClass().getResource("/48x48/bpjs_apotek.png")));
+        btnBPJSPermintaanResepIterasiApotek.setText("Permintaan Resep Iterasi Apotek BPJS");
+        btnBPJSPermintaanResepIterasiApotek.setIconTextGap(0);
+        btnBPJSPermintaanResepIterasiApotek.setName("btnBPJSPermintaanResepIterasiApotek"); 
+        btnBPJSPermintaanResepIterasiApotek.setPreferredSize(new java.awt.Dimension(200, 90));
+        btnBPJSPermintaanResepIterasiApotek.addActionListener(this::btnBPJSPermintaanResepIterasiApotekActionPerformed);
         
         btnCatatanKeperawatanRalan = new widget.ButtonBig();
         btnCatatanKeperawatanRalan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/48x48/6123164_avatar_frontliner_male_medical staff_nurse_icon.png")));

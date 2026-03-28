@@ -206,6 +206,7 @@ public final class DlgRawatJalan extends javax.swing.JDialog {
     private ResultSet rs,rstindakan,rsset_tarif,rsrekening;
     private int i=0,jmlparsial=0,jml=0,index=0,tinggi=0,cekDataPetugas = 0;
     private String aktifkanparsial="no",kode_poli="",kd_pj="",poli_ralan="No",cara_bayar_ralan="No",
+            KodeBPJS=Sequel.cariIsi("select password_asuransi.kd_pj from password_asuransi"),pilihiterasi="",
             Suspen_Piutang_Tindakan_Ralan="",Tindakan_Ralan="",Beban_Jasa_Medik_Dokter_Tindakan_Ralan="",Utang_Jasa_Medik_Dokter_Tindakan_Ralan="",
             Beban_Jasa_Medik_Paramedis_Tindakan_Ralan="",Utang_Jasa_Medik_Paramedis_Tindakan_Ralan="",Beban_KSO_Tindakan_Ralan="",Utang_KSO_Tindakan_Ralan="",
             Beban_Jasa_Sarana_Tindakan_Ralan="",Utang_Jasa_Sarana_Tindakan_Ralan="",HPP_BHP_Tindakan_Ralan="",Persediaan_BHP_Tindakan_Ralan="",
@@ -1794,6 +1795,7 @@ public final class DlgRawatJalan extends javax.swing.JDialog {
         FormMenu = new widget.PanelBiasa();
         BtnRiwayat = new widget.Button();
         BtnResepObat = new widget.Button();
+        BtnResepIterasiBPJS = new widget.Button();
         BtnCopyResep = new widget.Button();
         Konsul = new widget.Button();
         BtnPermintaanLab = new widget.Button();
@@ -4569,6 +4571,23 @@ public final class DlgRawatJalan extends javax.swing.JDialog {
             }
         });
         FormMenu.add(BtnResepObat);
+
+        BtnResepIterasiBPJS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/item.png"))); // NOI18N
+        BtnResepIterasiBPJS.setText("Iterasi Resep BPJS");
+        BtnResepIterasiBPJS.setFocusPainted(false);
+        BtnResepIterasiBPJS.setFont(new java.awt.Font("Tahoma", 0, 11));
+        BtnResepIterasiBPJS.setGlassColor(new java.awt.Color(255, 255, 255));
+        BtnResepIterasiBPJS.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        BtnResepIterasiBPJS.setMargin(new java.awt.Insets(1, 1, 1, 1));
+        BtnResepIterasiBPJS.setName("BtnResepIterasiBPJS"); // NOI18N
+        BtnResepIterasiBPJS.setPreferredSize(new java.awt.Dimension(190, 23));
+        BtnResepIterasiBPJS.setRoundRect(false);
+        BtnResepIterasiBPJS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnResepIterasiBPJSActionPerformed(evt);
+            }
+        });
+        FormMenu.add(BtnResepIterasiBPJS);
 
         BtnCopyResep.setIcon(new javax.swing.ImageIcon(getClass().getResource("/picture/bawaharah.png"))); // NOI18N
         BtnCopyResep.setText("Copy Resep");
@@ -8110,6 +8129,7 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
             JOptionPane.showMessageDialog(null,"Maaf, Silahkan anda pilih dulu dengan menklik data pada table...!!!");
             TCari.requestFocus();
         }else{   
+            pilihiterasi="";
             if(Sequel.cariInteger("select count(kamar_inap.no_rawat) from kamar_inap where kamar_inap.no_rawat=?",TNoRw.getText())>0){
                 JOptionPane.showMessageDialog(null,"Maaf, Pasien sudah masuk Kamar Inap. Gunakan billing Ranap..!!!");
             }else {
@@ -8129,6 +8149,69 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
             }            
         }
     }//GEN-LAST:event_BtnResepObatActionPerformed
+
+    private void BtnResepIterasiBPJSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnResepIterasiBPJSActionPerformed
+        if(TNoRw.getText().trim().equals("")){
+            JOptionPane.showMessageDialog(null,"Maaf, Silahkan anda pilih dulu dengan menklik data pada table...!!!");
+            TCari.requestFocus();
+        }else{
+            if(Sequel.cariInteger("select count(kamar_inap.no_rawat) from kamar_inap where kamar_inap.no_rawat=?",TNoRw.getText())>0){
+                JOptionPane.showMessageDialog(null,"Maaf, Pasien sudah masuk Kamar Inap. Gunakan billing Ranap..!!!");
+            }else{
+                jmlparsial=0;
+                if(aktifkanparsial.equals("yes")){
+                    jmlparsial=Sequel.cariInteger("select count(set_input_parsial.kd_pj) from set_input_parsial where set_input_parsial.kd_pj=?",kd_pj);
+                }
+                if(jmlparsial>0){
+                    if(kd_pj.equals(KodeBPJS)){
+                        String pilihaniterasibpjs=(String)JOptionPane.showInputDialog(null,"Silahkan pilih iterasi..!!","Pilihan Resep Iterasi",JOptionPane.QUESTION_MESSAGE,null,new Object[]{"Iterasi 1x","Iterasi 2x","Batal"},"Iterasi 1x");
+                        if(pilihaniterasibpjs==null){
+                            return;
+                        }
+                        switch (pilihaniterasibpjs) {
+                            case "Iterasi 1x":
+                                pilihiterasi="1. Iterasi 1x";
+                                inputResep();
+                                break;
+                            case "Iterasi 2x":
+                                pilihiterasi="2. Iterasi 2x";
+                                inputResep();
+                                break;
+                            default:
+                                break;
+                        }
+                    }else{
+                        JOptionPane.showMessageDialog(rootPane,"Cara/Jenis Bayar pasien bukan BPJS ..!!");
+                    }
+                }else{
+                    if(Sequel.cariRegistrasi(TNoRw.getText())>0){
+                        JOptionPane.showMessageDialog(rootPane,"Data billing sudah terverifikasi ..!!");
+                    }else{
+                        if(kd_pj.equals(KodeBPJS)){
+                            String pilihaniterasibpjs=(String)JOptionPane.showInputDialog(null,"Silahkan pilih iterasi..!!","Pilihan Resep Iterasi",JOptionPane.QUESTION_MESSAGE,null,new Object[]{"Iterasi 1x","Iterasi 2x","Batal"},"Iterasi 1x");
+                            if(pilihaniterasibpjs==null){
+                                return;
+                            }
+                            switch (pilihaniterasibpjs) {
+                                case "Iterasi 1x":
+                                    pilihiterasi="1. Iterasi 1x";
+                                    inputResep();
+                                    break;
+                                case "Iterasi 2x":
+                                    pilihiterasi="2. Iterasi 2x";
+                                    inputResep();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }else{
+                            JOptionPane.showMessageDialog(rootPane,"Cara/Jenis Bayar pasien bukan BPJS ..!!");
+                        }
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_BtnResepIterasiBPJSActionPerformed
 
     private void BtnObatBhpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnObatBhpActionPerformed
         if(TNoRw.getText().trim().equals("")){
@@ -10591,6 +10674,7 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
             JOptionPane.showMessageDialog(null,"Maaf, Silahkan anda pilih dulu dengan menklik data pada table...!!!");
             TCari.requestFocus();
         }else{   
+            pilihiterasi="";
             if(Sequel.cariInteger("select count(kamar_inap.no_rawat) from kamar_inap where kamar_inap.no_rawat=?",TNoRw.getText())>0){
                 JOptionPane.showMessageDialog(null,"Maaf, Pasien sudah masuk Kamar Inap. Gunakan billing Ranap..!!!");
             }else {
@@ -10904,6 +10988,7 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
     private widget.Button BtnPrint;
     private widget.Button BtnRekonsiliasiObat;
     private widget.Button BtnResepLuar;
+    private widget.Button BtnResepIterasiBPJS;
     private widget.Button BtnResepObat;
     private widget.Button BtnResepObat3;
     private widget.Button BtnResepRanap;
@@ -11518,6 +11603,15 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
         BtnTemplatePemeriksaan.setEnabled(akses.gettemplate_pemeriksaan());
         if(akses.getresep_dokter()==true){
             tinggi=tinggi+48;
+        }
+        BtnResepIterasiBPJS.setVisible(false);
+        if(koneksiDB.AKTIFKANRESEPITERDOKTER().equals("yes")){
+            if(kd_pj.equals(KodeBPJS)){
+                BtnResepIterasiBPJS.setVisible(akses.getresep_dokter());
+                if(akses.getresep_dokter()==true){
+                    tinggi=tinggi+24;
+                }
+            }
         }
         BtnObatBhp.setVisible(akses.getberi_obat());  
         BtnInputObat.setVisible(akses.getberi_obat()); 
@@ -13058,6 +13152,7 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
                 cmbDtk.getSelectedItem().toString(),KdDok.getText(),TDokter.getText(),"ralan");
         resep.isCek();
         resep.tampilobat();
+        resep.pilihIterasi(pilihiterasi);
         resep.setVisible(true);
     }
 

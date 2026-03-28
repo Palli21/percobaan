@@ -744,6 +744,29 @@ public class koneksiDB {
         return var;
     }
 
+    public static String AKTIFKANRESEPITERDOKTER(){
+        try{
+            loadProps();
+            var=prop.getProperty("AKTIFKANRESEPITERDOKTER");
+            if(var==null){
+                var="no";
+            }else{
+                if(kemungkinanNilaiTerenkripsi(var)){
+                    String hasilDekripsi=EnkripsiAES.decrypt(var);
+                    if((hasilDekripsi!=null)&&(!hasilDekripsi.trim().equals(""))){
+                        var=hasilDekripsi;
+                    }
+                }
+                if(var.trim().equals("")){
+                    var="no";
+                }
+            }
+        }catch(Exception e){
+            var="no";
+        }
+        return var;
+    }
+
     public static String KODEPPKAPOTEKBPJS(){
         try{
             loadProps();

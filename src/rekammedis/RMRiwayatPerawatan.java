@@ -17,9 +17,15 @@ import fungsi.batasInput;
 import fungsi.koneksiDB;
 import fungsi.sekuel;
 import fungsi.validasi;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
@@ -30,15 +36,27 @@ import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.text.Document;
@@ -47,12 +65,43 @@ import javax.swing.text.html.StyleSheet;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import simrskhanza.DlgCariPasien;
+import widget.Button;
+import widget.CekBox;
+import widget.RadioButton;
+import widget.TextBox;
 
 /**
  *
  * @author windiarto
  */
 public final class RMRiwayatPerawatan extends javax.swing.JDialog {    
+    private static final Color MAIN_BACKGROUND = new Color(241, 245, 249);
+    private static final Color MENU_PANEL_BACKGROUND = new Color(246, 249, 252);
+    private static final Color MENU_CARD_BACKGROUND = Color.WHITE;
+    private static final Color MENU_CARD_BORDER = new Color(214, 223, 232);
+    private static final Color MENU_HEADER_BACKGROUND = new Color(232, 240, 248);
+    private static final Color MENU_HEADER_BORDER = new Color(193, 208, 223);
+    private static final Color MENU_TITLE_COLOR = new Color(47, 79, 112);
+    private static final Color MENU_HINT_COLOR = new Color(101, 115, 132);
+    private static final Color TOOLBAR_BACKGROUND = Color.WHITE;
+    private static final Color TOOLBAR_BORDER = new Color(214, 223, 232);
+    private static final Color READ_ONLY_BACKGROUND = new Color(247, 250, 253);
+    private static final Color PRIMARY_TEXT = new Color(55, 66, 77);
+    private static final Color STATUS_SOAP_DOKTER = new Color(52, 122, 226);
+    private static final Color STATUS_TBAK = new Color(255, 23, 68);
+    private static final Color STATUS_SBAR = new Color(255, 242, 0);
+    private static final Color BUTTON_SEARCH = new Color(223, 236, 247);
+    private static final Color BUTTON_PRINT = new Color(240, 241, 245);
+    private static final Color BUTTON_ACCENT = new Color(225, 240, 232);
+    private static final Color BUTTON_DANGER = new Color(247, 228, 228);
+    private static final int MENU_EXPANDED_WIDTH = 324;
+    private static final int MENU_COLLAPSED_WIDTH = 24;
+    private static final int MENU_CONTENT_WIDTH = 282;
+    private static final int PATIENT_FORM_HEIGHT = 116;
+    private static final int PATIENT_PANEL_EXPANDED_HEIGHT = 150;
+    private static final int PATIENT_PANEL_COLLAPSED_HEIGHT = 34;
+    private static final String UKURAN_FONT_JUDUL_PERLEMBAR = "4";
+
     private validasi Valid=new validasi();    
     private final sekuel Sequel=new sekuel();
     private final DefaultTableModel tabModeRegistrasi;
@@ -75,7 +124,7 @@ public final class RMRiwayatPerawatan extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setLocation(8,1);
-        setSize(885,674);
+        setSize(1040,720);
         
         tabModeRegistrasi=new DefaultTableModel(null,new Object[]{
                 "No.","No.Rawat","Tanggal","Jam","Kd.Dokter","Dokter Dituju/DPJP","Umur","Poliklinik/Kamar","Jenis Bayar"
@@ -168,7 +217,15 @@ public final class RMRiwayatPerawatan extends javax.swing.JDialog {
         LoadHTMLPiutang.setEditorKit(kit);
         LoadHTMLRetensi.setEditorKit(kit);
         StyleSheet styleSheet = kit.getStyleSheet();
-        styleSheet.addRule(".isi td{border-right: 1px solid #e2e7dd;font: 8.5px tahoma;height:12px;border-bottom: 1px solid #e2e7dd;background: #ffffff;color:#323232;}.isi a{text-decoration:none;color:#8b9b95;padding:0 0 0 0px;font-family: Tahoma;font-size: 8.5px;border: white;}");
+        styleSheet.addRule("body{margin:0;padding:0;background:#F4F7FB;color:#334155;font-family:Tahoma;font-size:10px;}");
+        styleSheet.addRule("table{font-family:Tahoma;font-size:10px;color:#334155;}");
+        styleSheet.addRule(".tbl_form{border-collapse:collapse;border-spacing:0;background:#FFFFFF;}");
+        styleSheet.addRule(".isi td{border-right:1px solid #edf2f7;font:10px tahoma;padding:6px 8px;border-bottom:1px solid #e6edf3;background:#ffffff;color:#334155;line-height:1.45;vertical-align:top;}");
+        styleSheet.addRule(".isi a{text-decoration:none;color:#347AE2;padding:0;font-family:Tahoma;font-size:10px;border:white;}");
+        styleSheet.addRule(".record_banner td{background:#EAF3FB;color:#2F4F70;border-bottom:1px solid #D7E2EE;padding:10px;}");
+        styleSheet.addRule(".record_subinfo td{background:#F8FBFD;color:#64748B;border-bottom:1px solid #E6EDF3;padding:8px;}");
+        styleSheet.addRule(".soft_space td{border:none;background:#F4F7FB;height:12px;font-size:4px;}");
+        styleSheet.addRule(".empty_state td{background:#FFFFFF;color:#64748B;border:1px solid #D7E2EE;padding:16px;text-align:center;}");
         Document docRiwayatPerawatan = kit.createDefaultDocument();
         LoadHTMLRiwayatPerawatan.setDocument(docRiwayatPerawatan);
         LoadHTMLRiwayatPerawatan.setEditable(false);
@@ -235,9 +292,454 @@ public final class RMRiwayatPerawatan extends javax.swing.JDialog {
             }
         });
         
+        configureRiwayatPerawatanMenu();
+        configureMainFormUi();
         ChkAccor.setSelected(false);
         isMenu();
     }    
+
+    private void configureMainFormUi() {
+        getContentPane().setBackground(MAIN_BACKGROUND);
+        internalFrame1.setBackground(MAIN_BACKGROUND);
+        internalFrame1.setWarnaAtas(Color.WHITE);
+        internalFrame1.setWarnaBawah(MAIN_BACKGROUND);
+        internalFrame1.setBorder(BorderFactory.createCompoundBorder(
+                new EmptyBorder(8, 8, 8, 8),
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(TOOLBAR_BORDER, 1),
+                        "Data Riwayat, Rincian Tindakan, dan Terapi Pasien",
+                        TitledBorder.LEFT,
+                        TitledBorder.TOP,
+                        new Font("Tahoma", Font.BOLD, 12),
+                        MENU_TITLE_COLOR
+                )
+        ));
+
+        configureHeaderLayout();
+        configureSearchToolbar();
+        configurePatientPanel();
+        configureTabAppearance();
+        configureViewerPanels();
+        configureRegistrasiTable();
+        configureDiagnosaToolbar();
+    }
+
+    private void configureHeaderLayout() {
+        JPanel headerContainer = new JPanel(new BorderLayout(0, 8));
+        headerContainer.setOpaque(false);
+        JPanel toolbarContainer = new JPanel(new BorderLayout(0, 6));
+        toolbarContainer.setOpaque(false);
+
+        PanelInput.remove(ChkInput);
+        PanelInput.add(ChkInput, BorderLayout.PAGE_START);
+
+        internalFrame1.remove(PanelInput);
+        internalFrame1.remove(panelGlass5);
+        toolbarContainer.add(panelGlass5, BorderLayout.PAGE_START);
+        toolbarContainer.add(createColorLegendPanel(), BorderLayout.CENTER);
+        headerContainer.add(PanelInput, BorderLayout.PAGE_START);
+        headerContainer.add(toolbarContainer, BorderLayout.PAGE_END);
+        internalFrame1.add(headerContainer, BorderLayout.PAGE_START);
+    }
+
+    private void configureSearchToolbar() {
+        panelGlass5.setBackground(TOOLBAR_BACKGROUND);
+        panelGlass5.setWarnaAtas(Color.WHITE);
+        panelGlass5.setWarnaBawah(new Color(251, 253, 255));
+        panelGlass5.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(TOOLBAR_BORDER, 1),
+                new EmptyBorder(7, 10, 7, 10)
+        ));
+        panelGlass5.setPreferredSize(new Dimension(44, 54));
+
+        styleFilterOption(R1, 122);
+        styleFilterOption(R2, 112);
+        styleFilterOption(R3, 74);
+        styleFilterOption(R4, 78);
+
+        Tgl1.setPreferredSize(new Dimension(98, 23));
+        Tgl2.setPreferredSize(new Dimension(98, 23));
+        Tgl1.setBackground(Color.WHITE);
+        Tgl2.setBackground(Color.WHITE);
+
+        styleEditableField(NoRawat, new Dimension(145, 23));
+
+        label18.setForeground(MENU_HINT_COLOR);
+        label19.setPreferredSize(new Dimension(8, 23));
+
+        styleToolbarButton(BtnCari1, BUTTON_SEARCH, "Cari data pada tab yang aktif");
+        styleToolbarButton(BtnPrint, BUTTON_PRINT, "Cetak atau preview data pada tab aktif");
+        styleToolbarButton(BtnKeluar, BUTTON_DANGER, "Tutup form riwayat perawatan");
+    }
+
+    private void configurePatientPanel() {
+        PanelInput.setOpaque(false);
+        PanelInput.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+        ChkInput.setText(" Data Pasien");
+        ChkInput.setBackground(MENU_HEADER_BACKGROUND);
+        ChkInput.setForeground(MENU_TITLE_COLOR);
+        ChkInput.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(MENU_HEADER_BORDER, 1),
+                new EmptyBorder(6, 10, 6, 10)
+        ));
+        ChkInput.setPreferredSize(new Dimension(180, 30));
+        ChkInput.setOpaque(true);
+
+        FormInput.setBackground(Color.WHITE);
+        FormInput.setWarnaAtas(Color.WHITE);
+        FormInput.setWarnaBawah(new Color(250, 252, 255));
+        FormInput.setBorder(BorderFactory.createLineBorder(TOOLBAR_BORDER, 1));
+        FormInput.setPreferredSize(new Dimension(100, PATIENT_FORM_HEIGHT));
+        PanelInput.setPreferredSize(new Dimension(WIDTH, PATIENT_PANEL_EXPANDED_HEIGHT));
+
+        for (javax.swing.JLabel label : new javax.swing.JLabel[]{label17, label20, label21, label22, label23, label24, label25, label26, label27, label28, label29}) {
+            label.setFont(new Font("Tahoma", Font.BOLD, 11));
+            label.setForeground(MENU_TITLE_COLOR);
+        }
+
+        styleEditableField(NoRM, new Dimension(100, 23));
+        styleReadOnlyField(NmPasien, true);
+        styleReadOnlyField(Jk, false);
+        styleReadOnlyField(TempatLahir, false);
+        styleReadOnlyField(TanggalLahir, false);
+        styleReadOnlyField(Alamat, false);
+        styleReadOnlyField(GD, false);
+        styleReadOnlyField(IbuKandung, false);
+        styleReadOnlyField(Agama, false);
+        styleReadOnlyField(StatusNikah, false);
+        styleReadOnlyField(Pendidikan, false);
+        styleReadOnlyField(Bahasa, false);
+        styleReadOnlyField(CacatFisik, false);
+
+        BtnPasien.setToolTipText("Cari pasien berdasarkan nomor rekam medis");
+        BtnPasien.setGlassColor(BUTTON_ACCENT);
+        BtnPasien.setPreferredSize(new Dimension(30, 24));
+
+        NmPasien.setFont(new Font("Tahoma", Font.BOLD, 12));
+    }
+
+    private void configureTabAppearance() {
+        TabRawat.setBackground(MAIN_BACKGROUND);
+        TabRawat.setForeground(PRIMARY_TEXT);
+        TabRawat.setFont(new Font("Tahoma", Font.BOLD, 11));
+        TabRawat.setBorder(new EmptyBorder(8, 0, 0, 0));
+        TabRawat.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+
+        internalFrame2.setWarnaAtas(Color.WHITE);
+        internalFrame2.setWarnaBawah(MAIN_BACKGROUND);
+        internalFrame3.setWarnaAtas(Color.WHITE);
+        internalFrame3.setWarnaBawah(MAIN_BACKGROUND);
+    }
+
+    private void configureViewerPanels() {
+        for (widget.ScrollPane pane : new widget.ScrollPane[]{Scroll1, Scroll2, Scroll, Scroll3, Scroll4, Scroll5, Scroll6}) {
+            pane.setBorder(BorderFactory.createLineBorder(TOOLBAR_BORDER, 1));
+            pane.getViewport().setBackground(Color.WHITE);
+            pane.getVerticalScrollBar().setUnitIncrement(18);
+        }
+
+        for (JEditorPane editor : new JEditorPane[]{LoadHTMLRiwayatPerawatan, LoadHTMLSOAPI, LoadHTMLPembelian, LoadHTMLPiutang, LoadHTMLRetensi}) {
+            editor.setBackground(Color.WHITE);
+            editor.setForeground(PRIMARY_TEXT);
+            editor.setMargin(new Insets(14, 18, 14, 18));
+            editor.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        }
+    }
+
+    private void configureRegistrasiTable() {
+        tbRegistrasi.setBackground(Color.WHITE);
+        tbRegistrasi.setForeground(PRIMARY_TEXT);
+        tbRegistrasi.setRowHeight(24);
+        tbRegistrasi.setShowGrid(false);
+        tbRegistrasi.setIntercellSpacing(new Dimension(0, 1));
+        tbRegistrasi.setSelectionBackground(new Color(223, 236, 247));
+        tbRegistrasi.setSelectionForeground(PRIMARY_TEXT);
+        tbRegistrasi.setFillsViewportHeight(true);
+        tbRegistrasi.getTableHeader().setBackground(MENU_HEADER_BACKGROUND);
+        tbRegistrasi.getTableHeader().setForeground(MENU_TITLE_COLOR);
+        tbRegistrasi.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 11));
+        tbRegistrasi.getTableHeader().setReorderingAllowed(false);
+        tbRegistrasi.getTableHeader().setPreferredSize(new Dimension(10, 28));
+    }
+
+    private void configureDiagnosaToolbar() {
+        panelGlass8.setBackground(TOOLBAR_BACKGROUND);
+        panelGlass8.setWarnaAtas(Color.WHITE);
+        panelGlass8.setWarnaBawah(new Color(251, 253, 255));
+        panelGlass8.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(TOOLBAR_BORDER, 1),
+                new EmptyBorder(6, 10, 6, 10)
+        ));
+        panelGlass8.setPreferredSize(new Dimension(44, 52));
+
+        styleActionButton(BtnSimpan, BUTTON_ACCENT);
+        styleActionButton(BtnBatal, BUTTON_PRINT);
+        styleActionButton(BtnHapus, BUTTON_DANGER);
+        styleActionButton(BtnAll, BUTTON_SEARCH);
+
+        jLabel10.setForeground(MENU_HINT_COLOR);
+        jLabel10.setFont(new Font("Tahoma", Font.BOLD, 11));
+        LCount.setForeground(MENU_TITLE_COLOR);
+        LCount.setFont(new Font("Tahoma", Font.BOLD, 11));
+    }
+
+    private JPanel createColorLegendPanel() {
+        JPanel panelLegenda = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 6));
+        panelLegenda.setOpaque(true);
+        panelLegenda.setBackground(Color.WHITE);
+        panelLegenda.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(TOOLBAR_BORDER, 1),
+                new EmptyBorder(4, 8, 4, 8)
+        ));
+
+        JLabel judul = new JLabel("Keterangan Warna Status:");
+        judul.setFont(new Font("Tahoma", Font.BOLD, 11));
+        judul.setForeground(MENU_TITLE_COLOR);
+        panelLegenda.add(judul);
+        panelLegenda.add(createLegendItem(STATUS_SOAP_DOKTER, "Biru", "SOAP dokter"));
+        panelLegenda.add(createLegendItem(STATUS_TBAK, "Merah", "TBAK"));
+        panelLegenda.add(createLegendItem(STATUS_SBAR, "Kuning", "SBAR"));
+        return panelLegenda;
+    }
+
+    private JPanel createLegendItem(Color warna, String namaWarna, String keterangan) {
+        JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        item.setOpaque(false);
+
+        JPanel swatch = new JPanel();
+        swatch.setBackground(warna);
+        swatch.setPreferredSize(new Dimension(14, 14));
+        swatch.setBorder(BorderFactory.createLineBorder(MENU_CARD_BORDER, 1));
+        item.add(swatch);
+
+        JLabel label = new JLabel("<html><b>"+namaWarna+"</b>: "+keterangan+"</html>");
+        label.setFont(new Font("Tahoma", Font.PLAIN, 10));
+        label.setForeground(PRIMARY_TEXT);
+        item.add(label);
+        return item;
+    }
+
+    private void styleFilterOption(RadioButton radioButton, int width) {
+        radioButton.setBorder(new EmptyBorder(2, 2, 2, 2));
+        radioButton.setForeground(PRIMARY_TEXT);
+        radioButton.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        radioButton.setPreferredSize(new Dimension(width, 23));
+    }
+
+    private void styleToolbarButton(Button button, Color glassColor, String tooltip) {
+        button.setGlassColor(glassColor);
+        button.setForeground(PRIMARY_TEXT);
+        button.setPreferredSize(new Dimension(32, 26));
+        button.setToolTipText(tooltip);
+    }
+
+    private void styleActionButton(Button button, Color glassColor) {
+        button.setGlassColor(glassColor);
+        button.setForeground(PRIMARY_TEXT);
+        button.setPreferredSize(new Dimension(104, 30));
+    }
+
+    private void styleEditableField(TextBox textBox, Dimension ukuran) {
+        textBox.setBackground(Color.WHITE);
+        textBox.setForeground(PRIMARY_TEXT);
+        textBox.setPreferredSize(ukuran);
+    }
+
+    private void styleReadOnlyField(TextBox textBox, boolean highlight) {
+        textBox.setBackground(READ_ONLY_BACKGROUND);
+        textBox.setForeground(PRIMARY_TEXT);
+        if(highlight){
+            textBox.setFont(new Font("Tahoma", Font.BOLD, 12));
+        }
+    }
+
+    private void configureRiwayatPerawatanMenu() {
+        internalFrame2.setBackground(MENU_PANEL_BACKGROUND);
+        PanelAccor.setBackground(MENU_PANEL_BACKGROUND);
+        PanelAccor.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, MENU_CARD_BORDER));
+        ScrollMenu.setBackground(MENU_PANEL_BACKGROUND);
+        ScrollMenu.getViewport().setBackground(MENU_PANEL_BACKGROUND);
+        ScrollMenu.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        ScrollMenu.getVerticalScrollBar().setUnitIncrement(18);
+        ScrollMenu.setPreferredSize(new Dimension(MENU_EXPANDED_WIDTH - MENU_COLLAPSED_WIDTH, 0));
+        ChkAccor.setToolTipText("Tampilkan atau sembunyikan filter riwayat perawatan");
+        ChkAccor.setBackground(MENU_PANEL_BACKGROUND);
+        ChkAccor.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+        ChkAccor.setPreferredSize(new Dimension(MENU_COLLAPSED_WIDTH, 42));
+        FormMenu.setLayout(new BoxLayout(FormMenu, BoxLayout.Y_AXIS));
+        FormMenu.setBackground(MENU_PANEL_BACKGROUND);
+        FormMenu.setOpaque(true);
+        FormMenu.setBorder(new EmptyBorder(12, 12, 12, 12));
+        FormMenu.setPreferredSize(null);
+        rebuildRiwayatFilterMenu();
+    }
+
+    private void rebuildRiwayatFilterMenu() {
+        List<Component> urutanMenu = new ArrayList<>(Arrays.asList(FormMenu.getComponents()));
+        FormMenu.removeAll();
+        FormMenu.add(createMenuHeaderCard());
+        FormMenu.add(Box.createVerticalStrut(12));
+        addMenuSection(
+                "Ringkasan Utama",
+                "Dokumen paling sering dibutuhkan untuk melihat gambaran cepat kondisi dan perjalanan pasien.",
+                ambilKomponenMenu(urutanMenu, chkDiagnosaPenyakit, chkTriase)
+        );
+        addMenuSection(
+                "Asesmen Keperawatan",
+                "Kelompok formulir pengkajian awal dan tindak lanjut keperawatan di berbagai unit.",
+                ambilKomponenMenu(urutanMenu, chkAsuhanKeperawatanIGD, chkAsesmenKhususKebidananIbuNifas, chkAsuhanNicu)
+        );
+        addMenuSection(
+                "Asesmen Medis",
+                "Form asesmen awal dokter rawat jalan, IGD, rawat inap, dan layanan spesialistik.",
+                ambilKomponenMenu(urutanMenu, chkAsuhanMedisIGD, chkAsuhanMedisHemodialisa)
+        );
+        addMenuSection(
+                "Pemeriksaan Dan Catatan",
+                "Pemeriksaan, edukasi, observasi, dan catatan perkembangan pasien sepanjang perawatan.",
+                ambilKomponenMenu(urutanMenu, chkEdukasiPasienTerintegrasiRawatJalan, chkMonitoringReaksiTranfusi)
+        );
+        addMenuSection(
+                "Operasi Dan Perawatan Intensif",
+                "Dokumen pre-post operasi, anestesi, serta kriteria masuk dan keluar ruang intensif.",
+                ambilKomponenMenu(urutanMenu, chkAsuhanPreInduksi, chkChecklistKriteriaKeluarICU)
+        );
+        addMenuSection(
+                "Risiko, Gizi Dan Hasil",
+                "Pemantauan risiko jatuh, skrining nutrisi, hasil pemeriksaan, dan dokumen penunjang klinis.",
+                ambilKomponenMenu(urutanMenu, chkAsuhanLanjutanRisikoJatuhDewasa, chkCatatanADIMEGizi)
+        );
+        addMenuSection(
+                "Farmasi Dan Dokumen",
+                "Obat, edukasi farmasi, rekonsiliasi, serta perpindahan dan kelengkapan berkas pasien.",
+                ambilKomponenMenu(urutanMenu, chkRekonsiliasiObat, chkTransferAntarRuang)
+        );
+        addMenuSection(
+                "Asesmen Tambahan",
+                "Form tambahan untuk kondisi khusus, keselamatan, perilaku, dan resume pasien.",
+                ambilKomponenMenu(urutanMenu, chkPengkajianRestrain, chkResume)
+        );
+        addMenuSection(
+                "Tindakan Dan Billing",
+                "Semua tindakan dokter, perawat, penunjang, biaya, obat, kamar, dan konsultasi medik.",
+                ambilKomponenMenu(urutanMenu, chkTindakanRalanDokter, chkKonsultasiMedik)
+        );
+        FormMenu.revalidate();
+        FormMenu.repaint();
+    }
+
+    private JPanel createMenuHeaderCard() {
+        JPanel kartuHeader = new JPanel();
+        kartuHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
+        kartuHeader.setOpaque(true);
+        kartuHeader.setBackground(MENU_HEADER_BACKGROUND);
+        kartuHeader.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(MENU_HEADER_BORDER),
+                new EmptyBorder(12, 12, 12, 12)
+        ));
+        kartuHeader.setLayout(new BoxLayout(kartuHeader, BoxLayout.Y_AXIS));
+
+        JLabel judul = new JLabel("Filter Riwayat Perawatan");
+        judul.setAlignmentX(Component.LEFT_ALIGNMENT);
+        judul.setFont(new Font("Tahoma", Font.BOLD, 12));
+        judul.setForeground(MENU_TITLE_COLOR);
+        kartuHeader.add(judul);
+        kartuHeader.add(Box.createVerticalStrut(4));
+
+        JLabel petunjuk = new JLabel("<html>Pilih dokumen yang ingin ditampilkan agar riwayat pasien lebih fokus dan mudah dibaca.</html>");
+        petunjuk.setAlignmentX(Component.LEFT_ALIGNMENT);
+        petunjuk.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        petunjuk.setForeground(MENU_HINT_COLOR);
+        kartuHeader.add(petunjuk);
+        kartuHeader.add(Box.createVerticalStrut(10));
+
+        styleMenuCheckBox(chkSemua, true);
+        kartuHeader.add(chkSemua);
+        return kartuHeader;
+    }
+
+    private void addMenuSection(String judul, String deskripsi, List<Component> komponen) {
+        if(komponen.isEmpty()){
+            return;
+        }
+
+        JPanel section = new JPanel();
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+        section.setOpaque(false);
+        section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
+
+        JLabel labelJudul = new JLabel(judul);
+        labelJudul.setAlignmentX(Component.LEFT_ALIGNMENT);
+        labelJudul.setFont(new Font("Tahoma", Font.BOLD, 11));
+        labelJudul.setForeground(MENU_TITLE_COLOR);
+        section.add(labelJudul);
+
+        if((deskripsi!=null)&&(!deskripsi.trim().isEmpty())){
+            section.add(Box.createVerticalStrut(2));
+            JLabel labelDeskripsi = new JLabel("<html>"+deskripsi+"</html>");
+            labelDeskripsi.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelDeskripsi.setFont(new Font("Tahoma", Font.PLAIN, 10));
+            labelDeskripsi.setForeground(MENU_HINT_COLOR);
+            section.add(labelDeskripsi);
+        }
+
+        section.add(Box.createVerticalStrut(6));
+
+        JPanel card = new JPanel();
+        card.setAlignmentX(Component.LEFT_ALIGNMENT);
+        card.setOpaque(true);
+        card.setBackground(MENU_CARD_BACKGROUND);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(MENU_CARD_BORDER),
+                new EmptyBorder(6, 6, 6, 6)
+        ));
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+
+        for (Component komponenMenu : komponen) {
+            if(komponenMenu instanceof CekBox){
+                styleMenuCheckBox((CekBox)komponenMenu, false);
+            }
+            if(komponenMenu instanceof JComponent){
+                ((JComponent)komponenMenu).setAlignmentX(Component.LEFT_ALIGNMENT);
+            }
+            card.add(komponenMenu);
+        }
+
+        section.add(card);
+        section.add(Box.createVerticalStrut(10));
+        FormMenu.add(section);
+    }
+
+    private void styleMenuCheckBox(CekBox cekBox, boolean utama) {
+        cekBox.setHorizontalAlignment(SwingConstants.LEFT);
+        cekBox.setHorizontalTextPosition(SwingConstants.RIGHT);
+        cekBox.setOpaque(false);
+        cekBox.setBorder(new EmptyBorder(4, 4, 4, 4));
+        cekBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 26));
+        cekBox.setPreferredSize(new Dimension(MENU_CONTENT_WIDTH, 26));
+        cekBox.setFont(new Font("Tahoma", utama ? Font.BOLD : Font.PLAIN, 11));
+        cekBox.setForeground(utama ? MENU_TITLE_COLOR : new Color(55, 66, 77));
+    }
+
+    private List<Component> ambilKomponenMenu(List<Component> urutanMenu, Component awal, Component akhir, Component... tambahan) {
+        List<Component> hasil = new ArrayList<>();
+        int indexAwal = urutanMenu.indexOf(awal);
+        int indexAkhir = urutanMenu.indexOf(akhir);
+
+        if((indexAwal>=0)&&(indexAkhir>=indexAwal)){
+            hasil.addAll(urutanMenu.subList(indexAwal, indexAkhir + 1));
+        }
+
+        if(tambahan!=null){
+            for (Component komponenTambahan : tambahan) {
+                if((komponenTambahan!=null)&&(!hasil.contains(komponenTambahan))){
+                    hasil.add(komponenTambahan);
+                }
+            }
+        }
+        return hasil;
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -2841,9 +3343,59 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
         if(html==null){
             return "";
         }
+        String formatJudul = "$1<b><font face='Tahoma' size='"+UKURAN_FONT_JUDUL_PERLEMBAR+"' color='#2F4F70'>$2</font></b>$3";
         return html
-                .replaceAll("(<td\\s+valign='top'\\s+width='18%'\\s*>)([^<]+)(</td>)", "$1<b><font size='4'>$2</font></b>$3")
-                .replaceAll("(<td\\s+valign='middle'\\s+width='18%'\\s*>)([^<]+)(</td>)", "$1<b><font size='4'>$2</font></b>$3");
+                .replaceAll("(<td\\s+valign='top'\\s+width='18%'\\s*>)([^<]+)(</td>)", formatJudul)
+                .replaceAll("(<td\\s+valign='middle'\\s+width='18%'\\s*>)([^<]+)(</td>)", formatJudul);
+    }
+
+    private String buildRiwayatPerawatanHtml(String isiRows){
+        String konten = isiRows.trim().isEmpty()
+                ? "<table width='100%' border='0' align='center' cellpadding='0' cellspacing='0' class='tbl_form'>"+
+                  "<tr class='empty_state'><td>Belum ada data riwayat perawatan yang bisa ditampilkan untuk filter saat ini.</td></tr>"+
+                  "</table>"
+                : "<table width='100%' border='0' align='center' cellpadding='0' cellspacing='0' class='tbl_form'>"+
+                  isiRows+
+                  "</table>";
+
+        return "<html><body bgcolor='#F4F7FB'>"+
+               "<table width='100%' border='0' align='center' cellpadding='0' cellspacing='0'>"+
+                   "<tr>"+
+                       "<td bgcolor='#FFFFFF' style='border:1px solid #D7E2EE;padding:12px;'>"+
+                           "<font size='4' color='#2F4F70'><b>Riwayat Perawatan Pasien</b></font><br>"+
+                           "<font color='#64748B'>"+
+                               "<b>Pasien:</b> "+escapeHtml(NoRM.getText())+" - "+escapeHtml(NmPasien.getText())+
+                               " &nbsp;&nbsp;|&nbsp;&nbsp; <b>Filter:</b> "+escapeHtml(getRingkasanFilterRiwayat())+
+                           "</font>"+
+                       "</td>"+
+                   "</tr>"+
+                   "<tr class='soft_space'><td></td></tr>"+
+                   "<tr><td>"+konten+"</td></tr>"+
+               "</table>"+
+               "</body></html>";
+    }
+
+    private String getRingkasanFilterRiwayat() {
+        if(R1.isSelected()){
+            return "5 riwayat terakhir";
+        }else if(R2.isSelected()){
+            return "semua riwayat";
+        }else if(R3.isSelected()){
+            return "periode " + Tgl1.getSelectedItem() + " s.d. " + Tgl2.getSelectedItem();
+        }else if(R4.isSelected()){
+            return "nomor rawat " + NoRawat.getText().trim();
+        }
+        return "-";
+    }
+
+    private String escapeHtml(String teks){
+        if(teks==null){
+            return "";
+        }
+        return teks
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
     }
 
     private String formatStatusPemeriksaan(String statusPemeriksaan){
@@ -3123,15 +3675,28 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
     private void isMenu(){
         if(ChkAccor.isSelected()==true){
             ChkAccor.setVisible(false);
-            PanelAccor.setPreferredSize(new Dimension(275,HEIGHT));
-            FormMenu.setVisible(true); 
+            ScrollMenu.setVisible(true);
+            FormMenu.setVisible(true);
+            setLebarPanelMenu(MENU_EXPANDED_WIDTH);
             ChkAccor.setVisible(true);
         }else if(ChkAccor.isSelected()==false){  
             ChkAccor.setVisible(false);
-            PanelAccor.setPreferredSize(new Dimension(15,HEIGHT));
-            FormMenu.setVisible(false);    
+            ScrollMenu.setVisible(false);
+            FormMenu.setVisible(false);
+            setLebarPanelMenu(MENU_COLLAPSED_WIDTH);
             ChkAccor.setVisible(true);
         }
+        PanelAccor.revalidate();
+        PanelAccor.repaint();
+        internalFrame2.revalidate();
+        internalFrame2.repaint();
+    }
+
+    private void setLebarPanelMenu(int lebar) {
+        Dimension ukuran = new Dimension(lebar, 0);
+        PanelAccor.setPreferredSize(ukuran);
+        PanelAccor.setMinimumSize(ukuran);
+        PanelAccor.setMaximumSize(new Dimension(lebar, Integer.MAX_VALUE));
     }
 
     private void tampilPerawatan() {
@@ -3230,18 +3795,35 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
                                             htmlContent.toString()+
                                         "</table>");            */  
 
-                    htmlContent.append(                   
-                      "<tr class='isi'>"+ 
-                        "<td valign='top' width='2%'></td>"+
-                        "<td valign='top' width='18%'>LOGO</td>"+
-                        "<td valign='top' width='1%' align='center'></td>"+
-                        "<td valign='top' width='79%'align='center' font size='10' face='Tahoma'>"+akses.getnamars()+"</font><br>"+
-                        akses.getalamatrs()+", "+akses.getkabupatenrs()+", "+akses.getpropinsirs()+"<br>"+
-                        akses.getkontakrs()+", E-mail : "+akses.getemailrs()+"<br><br>"+    
-                         "</td>"+
-       
-                      "</tr>"+          
-                      "<tr class='isi'>"+ 
+                    htmlContent.append(
+                      "<tr>"+
+                        "<td colspan='4'>"+
+                          "<table width='100%' border='0' align='center' cellpadding='0' cellspacing='0' class='tbl_form'>"+
+                            "<tr class='record_banner'>"+
+                              "<td colspan='4'>"+
+                                "<table width='100%' border='0' align='center' cellpadding='1px' cellspacing='0'>"+
+                                  "<tr>"+
+                                    "<td valign='top' width='70%'>"+
+                                      "<font size='4' color='#2F4F70'><b>Kunjungan "+urut+"</b></font><br>"+
+                                      "<b>No.Rawat :</b> "+rs.getString("no_rawat")+"<br>"+
+                                      "<b>Unit/Poliklinik :</b> "+rs.getString("nm_poli")+polirujukan+
+                                    "</td>"+
+                                    "<td valign='top' width='30%' align='right'>"+
+                                      "<b>"+rs.getString("tgl_registrasi")+" "+rs.getString("jam_reg")+"</b><br>"+
+                                      "Status : "+rs.getString("status_lanjut")+"<br>"+
+                                      "Cara Bayar : "+rs.getString("png_jawab")+
+                                    "</td>"+
+                                  "</tr>"+
+                                "</table>"+
+                              "</td>"+
+                            "</tr>"+
+                            "<tr class='record_subinfo'>"+
+                              "<td colspan='4'>"+
+                                "<b>Dokter Poli :</b> "+rs.getString("nm_dokter")+dokterrujukan+
+                                " &nbsp;&nbsp;|&nbsp;&nbsp; <b>Rumah Sakit :</b> "+akses.getnamars()+
+                              "</td>"+
+                            "</tr>"+
+                            "<tr class='isi'>"+ 
                         "<td valign='top' width='2%'>"+urut+"</td>"+
                         "<td valign='top' width='18%'>No.Rawat</td>"+
                         "<td valign='top' width='1%' align='center'>:</td>"+
@@ -3347,6 +3929,8 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
                     menampilkanTriaseIGD(rs.getString("no_rawat"));
                     //menampilkan asuhan awal keperawatan IGD
                     menampilkanAsuhanKeperawatanIGD(rs.getString("no_rawat"));
+                    //menampilkan asuhan awal keperawatan bayi IGD
+                    menampilkanAsuhanKeperawatanBayiIGD(rs.getString("no_rawat"));
                     //menampilkan asuhan awal keperawatan rawat jalan
                     menampilkanAsuhanKeperawatanRalan(rs.getString("no_rawat"));
                     //menampilkan asuhan awal keperawatan rawat jalan gigi
@@ -5189,17 +5773,16 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
                         }
                     }
                     htmlContent.append(
-                        "<tr class='isi'><td></td><td colspan='3' align='right'>&nbsp;</tr>"
+                            "</table>"+
+                        "</td>"+
+                    "</tr>"+
+                    "<tr class='soft_space'><td colspan='4'></td></tr>"
                     );
                     
                 }
                 
                 setEditorTextSafely(LoadHTMLRiwayatPerawatan,
-                    "<html>"+
-                      "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0' class='tbl_form'>"+
-                       htmlContent.toString()+
-                      "</table>"+
-                    "</html>");
+                    buildRiwayatPerawatanHtml(htmlContent.toString()));
             } catch (Exception e) {
                 System.out.println("Notifikasi : "+e);
             } finally{
@@ -5953,12 +6536,12 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
     private void isForm(){
         if(ChkInput.isSelected()==true){
             ChkInput.setVisible(false);
-            PanelInput.setPreferredSize(new Dimension(WIDTH,126));
+            PanelInput.setPreferredSize(new Dimension(WIDTH,PATIENT_PANEL_EXPANDED_HEIGHT));
             FormInput.setVisible(true);      
             ChkInput.setVisible(true);
         }else if(ChkInput.isSelected()==false){           
             ChkInput.setVisible(false);            
-            PanelInput.setPreferredSize(new Dimension(WIDTH,20));
+            PanelInput.setPreferredSize(new Dimension(WIDTH,PATIENT_PANEL_COLLAPSED_HEIGHT));
             FormInput.setVisible(false);      
             ChkInput.setVisible(true);
         }
@@ -6687,6 +7270,283 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
             }
         } catch (Exception e) {
             System.out.println("Notif Asuhan Keperawatan IGD : "+e);
+        }
+    }
+
+    private void menampilkanAsuhanKeperawatanBayiIGD(String norawat) {
+        try {
+            if(chkAsuhanKeperawatanIGD.isSelected()==true){
+                try {
+                    rs2=koneksi.prepareStatement(
+                        "select pa.tanggal,ifnull(pa.nip,'') as nip,"+
+                        "ifnull(nullif(p.nama,''),ifnull(nullif(pa.petugas_display,''),'-')) as nama_petugas,"+
+                        "ifnull(nullif(pa.kategori_triage,''),'-') as kategori_triage,"+
+                        "ifnull(nullif(pa.keluhan_saat_ini,''),'-') as keluhan_saat_ini,"+
+                        "if(pa.alergi_tidak_ada='Ya','Tidak ada alergi',ifnull(nullif(pa.alergi_keterangan,''),'-')) as alergi_info,"+
+                        "ifnull(nullif(concat_ws(', ',"+
+                        "if(pa.airway_bebas='Ya','Bebas',null),"+
+                        "if(pa.airway_gargling='Ya','Gargling',null),"+
+                        "if(pa.airway_stridor='Ya','Stridor',null),"+
+                        "if(pa.airway_wheezing='Ya','Wheezing',null),"+
+                        "if(pa.airway_ronchi='Ya','Ronchi',null),"+
+                        "if(pa.airway_terintubasi='Ya','Terintubasi',null)),''),'-') as airway_summary,"+
+                        "ifnull(nullif(concat_ws(', ',"+
+                        "if(pa.breathing_spontan='Ya','Spontan',null),"+
+                        "if(pa.breathing_dispneu='Ya','Dispneu',null),"+
+                        "if(pa.breathing_ventilasi_mekanik='Ya','Ventilasi mekanik',null),"+
+                        "if(pa.breathing_tachipneu='Ya','Tachipneu',null),"+
+                        "if(pa.breathing_apneu='Ya','Apneu',null),"+
+                        "if(pa.breathing_memakai_ventilator='Ya','Memakai ventilator',null)),''),'-') as breathing_summary,"+
+                        "concat('Nadi: ',ifnull(nullif(pa.nadi_kualitas,''),'-'),', CRT: ',ifnull(nullif(pa.crt,''),'-'),"+
+                        "', Warna kulit: ',ifnull(nullif(pa.warna_kulit,''),'-'),', Perdarahan: ',ifnull(nullif(pa.perdarahan,''),'-'),"+
+                        "', Turgor: ',ifnull(nullif(pa.turgor_kulit,''),'-'),', Respirasi: ',ifnull(nullif(pa.respirasi,''),'-'),"+
+                        "', TD: ',ifnull(nullif(pa.tekanan_darah,''),'-')) as circulation_summary,"+
+                        "concat('Respon: ',ifnull(nullif(pa.respon,''),'-'),', Refleks: ',ifnull(nullif(pa.refleks,''),'-'),"+
+                        "', GCS: ',ifnull(nullif(pa.gcs,''),'-'),', Nadi: ',ifnull(nullif(pa.nadi_neurologi,''),'-'),"+
+                        "', Suhu: ',ifnull(nullif(pa.suhu,''),'-')) as neurologi_summary,"+
+                        "concat('1) ',ifnull(nullif(pa.skrining_gizi1,''),'-'),' [',pa.nilai_gizi1,']; ',"+
+                        "'2) ',ifnull(nullif(pa.skrining_gizi2,''),'-'),' [',pa.nilai_gizi2,']; ',"+
+                        "'Total: ',pa.total_skor_gizi,' (',ifnull(nullif(pa.keterangan_gizi,''),'-'),')',"+
+                        "if(pa.dietisien_diberitahu='Ya',concat('; Dietisien diberitahu jam ',ifnull(nullif(pa.jam_lapor_dietisien,''),'-')),'')) as gizi_summary,"+
+                        "concat('Alat bantu: ',ifnull(nullif(concat_ws(', ',"+
+                        "if(pa.fungsional_tidak='Ya','Tidak',null),"+
+                        "if(pa.fungsional_tongkat='Ya','Tongkat',null),"+
+                        "if(pa.fungsional_kursi_roda='Ya','Kursi roda',null),"+
+                        "if(pa.fungsional_lain='Ya',concat('Lain-lain',ifnull(if(pa.fungsional_lain_keterangan='','',concat(' (',pa.fungsional_lain_keterangan,')')),'')),null)),''),'-'),"+
+                        "', Cacat tubuh: ',ifnull(nullif(pa.cacat_tubuh,''),'-')) as fungsional_summary,"+
+                        "concat('1) ',ifnull(nullif(pa.humpty_skala1,''),'-'),' [',pa.humpty_nilai1,']; ',"+
+                        "'2) ',ifnull(nullif(pa.humpty_skala2,''),'-'),' [',pa.humpty_nilai2,']; ',"+
+                        "'3) ',ifnull(nullif(pa.humpty_skala3,''),'-'),' [',pa.humpty_nilai3,']; ',"+
+                        "'4) ',ifnull(nullif(pa.humpty_skala4,''),'-'),' [',pa.humpty_nilai4,']; ',"+
+                        "'5) ',ifnull(nullif(pa.humpty_skala5,''),'-'),' [',pa.humpty_nilai5,']; ',"+
+                        "'6) ',ifnull(nullif(pa.humpty_skala6,''),'-'),' [',pa.humpty_nilai6,']; ',"+
+                        "'7) ',ifnull(nullif(pa.humpty_skala7,''),'-'),' [',pa.humpty_nilai7,']; ',"+
+                        "'Total: ',pa.humpty_total,' (',ifnull(nullif(pa.humpty_keterangan,''),'-'),')') as humpty_summary,"+
+                        "concat('1) ',ifnull(nullif(pa.nips_skala1,''),'-'),' [',pa.nips_nilai1,']; ',"+
+                        "'2) ',ifnull(nullif(pa.nips_skala2,''),'-'),' [',pa.nips_nilai2,']; ',"+
+                        "'3) ',ifnull(nullif(pa.nips_skala3,''),'-'),' [',pa.nips_nilai3,']; ',"+
+                        "'4) ',ifnull(nullif(pa.nips_skala4,''),'-'),' [',pa.nips_nilai4,']; ',"+
+                        "'5) ',ifnull(nullif(pa.nips_skala5,''),'-'),' [',pa.nips_nilai5,']; ',"+
+                        "'Total: ',pa.nips_total,' (',ifnull(nullif(pa.nips_keterangan,''),'-'),')') as nips_summary,"+
+                        "ifnull(nullif(pa.penilaian_kondisi,''),'-') as penilaian_kondisi,"+
+                        "ifnull(nullif(concat_ws(', ',"+
+                        "if(pa.discharge_rawat_gabung='Ya','Bayi tetap bersama ibu (rawat gabung)',null),"+
+                        "if(pa.discharge_diselimuti_hangat='Ya','Diselimuti dan hangat',null),"+
+                        "if(pa.discharge_kirim_ke_ruang_bayi='Ya','Kirim ke ruang bayi segera',null),"+
+                        "if(pa.discharge_vitamin_k='Ya','Vitamin K diberikan',null),"+
+                        "if(pa.discharge_observasi_suhu='Ya','Observasi suhu 2-3 jam',null),"+
+                        "if(pa.discharge_pemantauan_glukosa='Ya','Pemantauan glukosa darah',null),"+
+                        "if(pa.discharge_edukasi_keluarga='Ya','Edukasi keluarga',null)),''),'-') as discharge_summary,"+
+                        "ifnull(nullif(pa.discharge_lainnya,''),'-') as discharge_lainnya,"+
+                        "ifnull(nullif(concat_ws(', ',"+
+                        "if(pa.diagnosis_bersihan_jalan_napas_tidak_efektif='Ya','Bersihan jalan napas tidak efektif',null),"+
+                        "if(pa.diagnosis_pola_napas_tidak_efektif='Ya','Pola napas tidak efektif',null),"+
+                        "if(pa.diagnosis_gangguan_pertukaran_gas='Ya','Gangguan pertukaran gas',null),"+
+                        "if(pa.diagnosis_termoregulasi_tidak_efektif='Ya','Termoregulasi tidak efektif',null),"+
+                        "if(pa.diagnosis_ketidakseimbangan_nutrisi='Ya','Ketidakseimbangan nutrisi',null),"+
+                        "if(pa.diagnosis_ikterik_berhubungan_menyusui='Ya','Ikterik berhubungan minum / menyusui',null),"+
+                        "if(pa.diagnosis_kurang_volume_cairan='Ya','Kurang volume cairan',null),"+
+                        "if(pa.diagnosis_diare='Ya','Diare',null),"+
+                        "if(pa.diagnosis_perfusi_jaringan_gastrointestinal='Ya','Perfusi jaringan gastrointestinal tidak efektif',null),"+
+                        "if(pa.diagnosis_kesiapan_peningkatan_nutrisi='Ya','Kesiapan peningkatan kebutuhan nutrisi',null),"+
+                        "if(pa.diagnosis_menyusui_tidak_efektif='Ya','Menyusui tidak efektif',null),"+
+                        "if(pa.diagnosis_risiko_infeksi='Ya','Risiko infeksi',null),"+
+                        "if(pa.diagnosis_risiko_aspirasi='Ya','Risiko aspirasi',null),"+
+                        "if(pa.diagnosis_risiko_kerusakan_integritas_kulit='Ya','Risiko kerusakan integritas kulit',null)),''),'-') as diagnosis_summary,"+
+                        "ifnull(nullif(concat_ws(', ',"+
+                        "if(pa.psikologis_cemas='Ya','Cemas',null),"+
+                        "if(pa.psikologis_takut='Ya','Takut',null),"+
+                        "if(pa.psikologis_marah='Ya','Marah',null),"+
+                        "if(pa.psikologis_sedih='Ya','Sedih',null)),''),'-') as psikologis_summary,"+
+                        "concat('Orientasi baik: ',if(pa.mental_orientasi_baik='Ya','Ya','Tidak'),"+
+                        "', Masalah perilaku: ',if(pa.mental_masalah_perilaku='Ya',concat('Ya',if(pa.mental_masalah_perilaku_keterangan='','',concat(' (',pa.mental_masalah_perilaku_keterangan,')'))),'Tidak'),"+
+                        "', Perilaku kekerasan: ',if(pa.mental_perilaku_kekerasan='Ya','Ya','Tidak')) as mental_summary,"+
+                        "concat('Status sosial: ',ifnull(nullif(pa.status_sosial,''),'-'),"+
+                        "', Tempat tinggal: ',ifnull(nullif(pa.tempat_tinggal,''),'-'),"+
+                        "', Hubungan keluarga: ',ifnull(nullif(pa.hubungan_keluarga,''),'-'),"+
+                        "', Orang tua / wali: ',ifnull(nullif(pa.orang_tua_wali_bayi,''),'-')) as sosial_summary "+
+                        "from penilaian_awal_keperawatan_bayi_igd pa left join petugas p on p.nip=pa.nip "+
+                        "where pa.no_rawat='"+norawat+"'").executeQuery();
+                    if(rs2.next()){
+                        htmlContent.append(
+                          "<tr class='isi'>"+
+                            "<td valign='top' width='2%'></td>"+
+                            "<td valign='top' width='18%'>Penilaian Awal Keperawatan Bayi IGD</td>"+
+                            "<td valign='top' width='1%' align='center'>:</td>"+
+                            "<td valign='top' width='79%'>"+
+                              "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0' class='tbl_form'>"
+                        );
+                        rs2.beforeFirst();
+                        while(rs2.next()){
+                            htmlContent.append(
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "YANG MELAKUKAN PENGKAJIAN"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='34%' border='0'>Tanggal : "+rs2.getString("tanggal")+"</td>"+
+                                              "<td width='33%' border='0'>Petugas : "+rs2.getString("nip")+" "+rs2.getString("nama_petugas")+"</td>"+
+                                              "<td width='33%' border='0'>Kategori Triage : "+rs2.getString("kategori_triage")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "I. KELUHAN DAN ALERGI"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Keluhan saat ini / mekanisme kejadian : "+rs2.getString("keluhan_saat_ini").replaceAll("(\r\n|\r|\n|\n\r)","<br>")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Riwayat alergi : "+rs2.getString("alergi_info")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "II. PRIMARY SURVEY"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='50%' border='0'>Airway : "+rs2.getString("airway_summary")+"</td>"+
+                                              "<td width='50%' border='0'>Breathing : "+rs2.getString("breathing_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='50%' border='0'>Sirkulasi : "+rs2.getString("circulation_summary")+"</td>"+
+                                              "<td width='50%' border='0'>Neurologis : "+rs2.getString("neurologi_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "III. GIZI, FUNGSIONAL DAN RISIKO JATUH"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Skrining gizi : "+rs2.getString("gizi_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Status fungsional : "+rs2.getString("fungsional_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Humpty Dumpty : "+rs2.getString("humpty_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "IV. NIPS DAN DISCHARGE PLANNING"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>NIPS : "+rs2.getString("nips_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Penilaian kondisi : "+rs2.getString("penilaian_kondisi").replaceAll("(\r\n|\r|\n|\n\r)","<br>")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Discharge planning : "+rs2.getString("discharge_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Catatan discharge lain : "+rs2.getString("discharge_lainnya").replaceAll("(\r\n|\r|\n|\n\r)","<br>")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "V. DIAGNOSIS DAN SOSIAL PSIKOLOGI"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Diagnosis keperawatan : "+rs2.getString("diagnosis_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Status psikologis : "+rs2.getString("psikologis_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Keadaan mental : "+rs2.getString("mental_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Sosial / keluarga : "+rs2.getString("sosial_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                               "<td valign='middle' bgcolor='#FFFAF8' align='center' width='50%'>MASALAH KEPERAWATAN :</td>"+
+                                               "<td valign='middle' bgcolor='#FFFAF8' align='center' width='50%'>RENCANA KEPERAWATAN :</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                               "<td valign='top'>");
+                            try {
+                                boolean adamasalah=false;
+                                rs3=koneksi.prepareStatement(
+                                    "select master_masalah_keperawatan_anak.nama_masalah from master_masalah_keperawatan_anak "+
+                                    "inner join penilaian_awal_keperawatan_bayi_igd_masalah on penilaian_awal_keperawatan_bayi_igd_masalah.kode_masalah=master_masalah_keperawatan_anak.kode_masalah "+
+                                    "where penilaian_awal_keperawatan_bayi_igd_masalah.no_rawat='"+norawat+"' order by penilaian_awal_keperawatan_bayi_igd_masalah.kode_masalah").executeQuery();
+                                while(rs3.next()){
+                                    htmlContent.append(rs3.getString("nama_masalah")+"<br>");
+                                    adamasalah=true;
+                                }
+                                if(adamasalah==false){
+                                    htmlContent.append(rs2.getString("diagnosis_summary"));
+                                }
+                            } catch (Exception e) {
+                                System.out.println("Notif : "+e);
+                            } finally{
+                                if(rs3!=null){
+                                    rs3.close();
+                                }
+                            }
+                            htmlContent.append("</td>"+
+                                               "<td valign='top'>");
+                            try {
+                                boolean adarencana=false;
+                                rs3=koneksi.prepareStatement(
+                                    "select master_rencana_keperawatan_anak.rencana_keperawatan from master_rencana_keperawatan_anak "+
+                                    "inner join penilaian_awal_keperawatan_bayi_igd_rencana on penilaian_awal_keperawatan_bayi_igd_rencana.kode_rencana=master_rencana_keperawatan_anak.kode_rencana "+
+                                    "where penilaian_awal_keperawatan_bayi_igd_rencana.no_rawat='"+norawat+"' order by penilaian_awal_keperawatan_bayi_igd_rencana.kode_rencana").executeQuery();
+                                while(rs3.next()){
+                                    htmlContent.append(rs3.getString("rencana_keperawatan")+"<br>");
+                                    adarencana=true;
+                                }
+                                if(adarencana==false){
+                                    htmlContent.append(rs2.getString("discharge_summary"));
+                                }
+                            } catch (Exception e) {
+                                System.out.println("Notif : "+e);
+                            } finally{
+                                if(rs3!=null){
+                                    rs3.close();
+                                }
+                            }
+                            htmlContent.append(
+                                            "</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"
+                            );
+                        }
+                        htmlContent.append(
+                              "</table>"+
+                            "</td>"+
+                          "</tr>");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Notifikasi : "+e);
+                } finally{
+                    if(rs2!=null){
+                        rs2.close();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Notif Asuhan Keperawatan Bayi IGD : "+e);
         }
     }
 

@@ -26,7 +26,9 @@ import fungsi.validasi;
 import fungsi.akses;
 import java.awt.Cursor;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -349,36 +351,43 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
         try {
             headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-	    headers.add("x-cons-id",koneksiDB.CONSIDAPIAPOTEKBPJS());
-	    utc=String.valueOf(api.GetUTCdatetimeAsString());
-	    headers.add("x-timestamp",utc);
-	    headers.add("x-signature",api.getHmac(utc));
-	    headers.add("user_key",koneksiDB.USERKEYAPIAPOTEKBPJS());
+		    headers.add("x-cons-id",koneksiDB.CONSIDAPIAPOTEKBPJS());
+		    utc=String.valueOf(api.GetUTCdatetimeAsString());
+		    headers.add("x-timestamp",utc);
+		    headers.add("x-signature",api.getHmac(utc));
+		    headers.add("user_key",koneksiDB.USERKEYAPIAPOTEKBPJS());
             requestEntity = new HttpEntity(headers);
             URL = link+"/referensi/poli/"+keyword;	
             System.out.println(URL);
             root = mapper.readTree(api.getRest().exchange(URL, HttpMethod.GET, requestEntity, String.class).getBody());
             nameNode = root.path("metaData");
             if(nameNode.path("code").asText().equals("200")){
-                Valid.tabelKosong(tabMode);
                 response = mapper.readTree(api.Decrypt(root.path("response").asText(),utc));
-                //response = root.path("response");
+                List<Object[]> dataPoli = new ArrayList<>();
                 if(response.path("list").isArray()){
                     i=1;
                     for(JsonNode list:response.path("list")){
-                        tabMode.addRow(new Object[]{
+                        dataPoli.add(new Object[]{
                             i+".",list.path("kode").asText(),list.path("nama").asText()
                         });
                         i++;
                     }
                 }
+                updateTable(dataPoli);
             }else {
-                JOptionPane.showMessageDialog(null,nameNode.path("message").asText());                
+                tampilkanPesan(nameNode.path("message").asText());
             }  
         } catch (Exception ex) {
             System.out.println("Notifikasi : "+ex);
+            ex.printStackTrace(System.out);
+            if(ex instanceof InterruptedException || Thread.currentThread().isInterrupted()){
+                Thread.currentThread().interrupt();
+                return;
+            }
             if(ex.toString().contains("UnknownHostException")){
-                JOptionPane.showMessageDialog(rootPane,"Koneksi ke server BPJS terputus...!");
+                tampilkanPesan("Koneksi ke server BPJS terputus...!");
+            }else{
+                tampilkanPesan("Terjadi kendala saat mengambil referensi poli BPJS.\n"+ex.getMessage());
             }
         }
     }    
@@ -415,7 +424,38 @@ public final class ApotekBPJSCekReferensiPoli extends javax.swing.JDialog {
     
     @Override
     public void dispose() {
-        executor.shutdownNow();
+        executor.shutdown();
         super.dispose();
+    }
+
+    private void updateTable(List<Object[]> rows) {
+        runOnEdt(() -> {
+            if (!isDisplayable()) {
+                return;
+            }
+            Valid.tabelKosong(tabMode);
+            for (Object[] row : rows) {
+                tabMode.addRow(row);
+            }
+        });
+    }
+
+    private void tampilkanPesan(String pesan) {
+        if (pesan == null || pesan.trim().isEmpty()) {
+            return;
+        }
+        runOnEdt(() -> {
+            if (isDisplayable()) {
+                JOptionPane.showMessageDialog(this,pesan);
+            }
+        });
+    }
+
+    private void runOnEdt(Runnable task) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            SwingUtilities.invokeLater(task);
+        }
     }
 }

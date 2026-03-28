@@ -67,7 +67,7 @@ public final class DlgPeresepanDokter extends javax.swing.JDialog {
     private WarnaTable2 warna3 = new WarnaTable2();
     private DlgCariMetodeRacik metoderacik = new DlgCariMetodeRacik(null, false);
     public DlgCariDokter dokter = new DlgCariDokter(null, false);
-    private String noracik = "", aktifkanbatch = "no", STOKKOSONGRESEP = "no", qrystokkosong = "", tampilkan_ppnobat_ralan = "", status = "", bangsal = "", resep = "", DEPOAKTIFOBAT = "",
+    private String pilihiterasi = "", noracik = "", aktifkanbatch = "no", STOKKOSONGRESEP = "no", qrystokkosong = "", tampilkan_ppnobat_ralan = "", status = "", bangsal = "", resep = "", DEPOAKTIFOBAT = "",
             kamar = "", norawatibu = "", kelas, bangsaldefault = Sequel.cariIsi("select set_lokasi.kd_bangsal from set_lokasi limit 1"), RESEPRAJALKEPLAN = "no";
 
     /**
@@ -1383,6 +1383,9 @@ private void BtnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 }
 
                 Sequel.Commit();
+                if(!pilihiterasi.equals("")){
+                    Sequel.menyimpan2("antrianiterasi","?,?",2,new String[]{NoResep.getText(),pilihiterasi});
+                }
                 for (i = 0; i < tbResep.getRowCount(); i++) {
                     tbResep.setValueAt("", i, 1);
                     tbResep.setValueAt("", i, 2);
@@ -4345,5 +4348,9 @@ private void ppBersihkanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         SetHarga();
         ubah = false;
         copy = false;
+    }
+
+    public void pilihIterasi(String pilihaniterasi) {
+        pilihiterasi = pilihaniterasi;
     }
 }
