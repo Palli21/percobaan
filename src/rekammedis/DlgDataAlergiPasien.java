@@ -44,6 +44,8 @@ public class DlgDataAlergiPasien extends javax.swing.JDialog {
     private DlgCariPetugas petugas = new DlgCariPetugas(null, false);
     private StringBuilder htmlContent;
     private SatuSehatCariAllergy allergycode = new SatuSehatCariAllergy(null, false);
+    private String noRawatAlergiDipilih = "";
+    private String tglPerawatanAlergiDipilih = "";
 
     /**
      * Creates new form DlgPemberianInfus
@@ -757,9 +759,11 @@ public class DlgDataAlergiPasien extends javax.swing.JDialog {
 
     private void BtnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnHapusActionPerformed
         if (tbObat.getSelectedRow() > -1) {
+            String noRawat = tbObat.getValueAt(tbObat.getSelectedRow(), 0).toString();
+            String tglPerawatan = tbObat.getValueAt(tbObat.getSelectedRow(), 7).toString();
             if (akses.getkode().equals("Admin Utama")) {
-                if (Sequel.queryu2tf("delete from alergi_pasien where no_rawat=?", 1, new String[]{
-                    tbObat.getValueAt(tbObat.getSelectedRow(), 0).toString()
+                if (Sequel.queryu2tf("delete from alergi_pasien where no_rawat=? and tgl_perawatan=?", 2, new String[]{
+                    noRawat, tglPerawatan
                 }) == true) {
                     tampil();
                     emptTeks();
@@ -768,8 +772,8 @@ public class DlgDataAlergiPasien extends javax.swing.JDialog {
                 }
             } else {
                 if (akses.getkode().equals(tbObat.getValueAt(tbObat.getSelectedRow(), 14).toString())) {
-                    if (Sequel.queryu2tf("delete from alergi_pasien where no_rawat=?", 1, new String[]{
-                        tbObat.getValueAt(tbObat.getSelectedRow(), 0).toString()
+                    if (Sequel.queryu2tf("delete from alergi_pasien where no_rawat=? and tgl_perawatan=?", 2, new String[]{
+                        noRawat, tglPerawatan
                     }) == true) {
                         tampil();
                         emptTeks();
@@ -1083,7 +1087,7 @@ public class DlgDataAlergiPasien extends javax.swing.JDialog {
                     + "	ON \n"
                     + "		alergi_pasien.reactioncode = satu_sehat_ref_allergy_reaction.kode "
                     + "where alergi_pasien.tgl_perawatan between ? and ? "
-                    + (TCari.getText().equals("") ? "" : " and alergi_pasien.no_rawat like ? or reg_periksa.no_rkm_medis like ? or pasien.nm_pasien like ? ")
+                    + (TCari.getText().equals("") ? "" : " and (alergi_pasien.no_rawat like ? or reg_periksa.no_rkm_medis like ? or pasien.nm_pasien like ?) ")
                     + " order by alergi_pasien.no_rawat");
             try {
                 ps.setString(1, Valid.SetTgl(DTPCari1.getSelectedItem() + "") + " 00:00:00");
@@ -1135,11 +1139,15 @@ public class DlgDataAlergiPasien extends javax.swing.JDialog {
         TKeterangan.setText("");
         cmbKategory.setSelectedIndex(0);
         cmbSeverity.setSelectedIndex(0);
+        noRawatAlergiDipilih = "";
+        tglPerawatanAlergiDipilih = "";
     }
 
     private void getData() {
         // "No.Rawat", "No.RM", "Nama Pasien", "J.K.", "Umur", "No.Telp", "Cara Bayar", "TANGGAL", "KODE", "ALERGI", "KATEGORI", "REAKSI KODE", "SEVERITY", "NOTE", "NIP", "Nama Petugas"
         if (tbObat.getSelectedRow() != -1) {
+            noRawatAlergiDipilih = tbObat.getValueAt(tbObat.getSelectedRow(), 0).toString();
+            tglPerawatanAlergiDipilih = tbObat.getValueAt(tbObat.getSelectedRow(), 7).toString();
             NoRw.setText(tbObat.getValueAt(tbObat.getSelectedRow(), 0).toString());
             NoRM.setText(tbObat.getValueAt(tbObat.getSelectedRow(), 1).toString());
             NmPasien.setText(tbObat.getValueAt(tbObat.getSelectedRow(), 2).toString());
@@ -1149,7 +1157,7 @@ public class DlgDataAlergiPasien extends javax.swing.JDialog {
             AlergyDisplay.setText(Sequel.cariIsi("select display from satu_sehat_ref_allergy where kode='" + AlergiCode.getText() + "'"));
             ReaksiDisplay.setText(Sequel.cariIsi("select display from satu_sehat_ref_allergy_reaction where kode='" + ReaksiCode.getText() + "'"));
             ReaksiSystem.setText(Sequel.cariIsi("select system from satu_sehat_ref_allergy_reaction where kode='" + ReaksiCode.getText() + "'"));
-            TKeterangan.setText(tbObat.getValueAt(tbObat.getSelectedRow(), 12).toString());
+            TKeterangan.setText(tbObat.getValueAt(tbObat.getSelectedRow(), 13).toString());
             cmbKategory.setSelectedItem(tbObat.getValueAt(tbObat.getSelectedRow(), 10).toString());
             cmbSeverity.setSelectedItem(tbObat.getValueAt(tbObat.getSelectedRow(), 12).toString());
         }
@@ -1170,9 +1178,16 @@ public class DlgDataAlergiPasien extends javax.swing.JDialog {
     }
 
     private void ganti() {
-
-        if (Sequel.mengedittf("alergi_pasien", "no_rawat=?", "no_rawat=?,tgl_perawatan=?,allergy_code=?,category=?,nippetugas=?,note=?,reactioncode=?,severity=?", 9, new String[]{
-            NoRw.getText(), Sequel.cariIsi("select CURRENT_TIMESTAMP()"), AlergiCode.getText(), cmbKategory.getSelectedItem().toString(), akses.getkode(), TKeterangan.getText(), ReaksiCode.getText(), cmbSeverity.getSelectedItem().toString(), tbObat.getValueAt(tbObat.getSelectedRow(), 0).toString()
+        String noRawatLama = noRawatAlergiDipilih;
+        String tglPerawatanLama = tglPerawatanAlergiDipilih;
+        if (noRawatLama.equals("") && tbObat.getSelectedRow() > -1) {
+            noRawatLama = tbObat.getValueAt(tbObat.getSelectedRow(), 0).toString();
+        }
+        if (tglPerawatanLama.equals("") && tbObat.getSelectedRow() > -1) {
+            tglPerawatanLama = tbObat.getValueAt(tbObat.getSelectedRow(), 7).toString();
+        }
+        if (Sequel.mengedittf("alergi_pasien", "no_rawat=? and tgl_perawatan=?", "no_rawat=?,tgl_perawatan=?,allergy_code=?,category=?,nippetugas=?,note=?,reactioncode=?,severity=?", 10, new String[]{
+            NoRw.getText(), Sequel.cariIsi("select CURRENT_TIMESTAMP()"), AlergiCode.getText(), cmbKategory.getSelectedItem().toString(), akses.getkode(), TKeterangan.getText(), ReaksiCode.getText(), cmbSeverity.getSelectedItem().toString(), noRawatLama, tglPerawatanLama
         }) == true) {
             tampil();
             emptTeks();
