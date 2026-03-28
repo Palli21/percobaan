@@ -3931,6 +3931,8 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
                     menampilkanAsuhanKeperawatanIGD(rs.getString("no_rawat"));
                     //menampilkan asuhan awal keperawatan bayi IGD
                     menampilkanAsuhanKeperawatanBayiIGD(rs.getString("no_rawat"));
+                    //menampilkan asuhan awal keperawatan anak IGD
+                    menampilkanAsuhanKeperawatanAnakIGD(rs.getString("no_rawat"));
                     //menampilkan asuhan awal keperawatan rawat jalan
                     menampilkanAsuhanKeperawatanRalan(rs.getString("no_rawat"));
                     //menampilkan asuhan awal keperawatan rawat jalan gigi
@@ -7547,6 +7549,166 @@ private void BtnPasienKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event
             }
         } catch (Exception e) {
             System.out.println("Notif Asuhan Keperawatan Bayi IGD : "+e);
+        }
+    }
+
+    private void menampilkanAsuhanKeperawatanAnakIGD(String norawat) {
+        try {
+            if(chkAsuhanKeperawatanIGD.isSelected()==true){
+                try {
+                    rs2=koneksi.prepareStatement(RMPenilaianAwalKeperawatanAnakIGD.buildRingkasanQuery(norawat)).executeQuery();
+                    if(rs2.next()){
+                        htmlContent.append(
+                          "<tr class='isi'>"+
+                            "<td valign='top' width='2%'></td>"+
+                            "<td valign='top' width='18%'>Penilaian Awal Keperawatan Anak IGD</td>"+
+                            "<td valign='top' width='1%' align='center'>:</td>"+
+                            "<td valign='top' width='79%'>"+
+                              "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0' class='tbl_form'>"
+                        );
+                        rs2.beforeFirst();
+                        while(rs2.next()){
+                            htmlContent.append(
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "YANG MELAKUKAN PENGKAJIAN"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='50%' border='0'>Tanggal : "+rs2.getString("tanggal_text")+"</td>"+
+                                              "<td width='50%' border='0'>Petugas : "+rs2.getString("nama_petugas")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='50%' border='0'>Kategori Triage : "+rs2.getString("kategori_triage")+"</td>"+
+                                              "<td width='50%' border='0'>No. RM : "+rs2.getString("no_rkm_medis")+" / "+rs2.getString("nm_pasien")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "I. KELUHAN DAN ALERGI"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Keluhan saat ini / mekanisme kejadian : "+rs2.getString("keluhan_saat_ini").replaceAll("(\r\n|\r|\n|\n\r)","<br>")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Riwayat alergi : "+rs2.getString("alergi_info")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "II. PRIMARY SURVEY"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='50%' border='0'>Airway : "+rs2.getString("airway_summary")+"</td>"+
+                                              "<td width='50%' border='0'>Breathing : "+rs2.getString("breathing_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='50%' border='0'>Sirkulasi : "+rs2.getString("circulation_summary")+"</td>"+
+                                              "<td width='50%' border='0'>Neurologis : "+rs2.getString("neurologi_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "III. SKRINING GIZI"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Skrining gizi : "+rs2.getString("gizi_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "IV. STATUS FUNGSIONAL DAN KEBUTUHAN PERAWATAN HARIAN"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Status fungsional : "+rs2.getString("fungsional_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Kebutuhan perawatan harian : "+rs2.getString("perawatan_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "V. HUMPTY DUMPTY"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Risiko jatuh : "+rs2.getString("humpty_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "VI. NYERI"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>NRS / Wong Baker : "+rs2.getString("nyeri_nrs_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>FLACC : "+rs2.getString("flacc_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Detail nyeri : "+rs2.getString("nyeri_detail_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "VII. SOSIAL PSIKOLOGI"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Status psikologis : "+rs2.getString("psikologis_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Keadaan mental : "+rs2.getString("mental_summary")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='100%' border='0'>Sosial / keluarga : "+rs2.getString("sosial_summary")+"</td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"+
+                                 "<tr>"+
+                                    "<td valign='top'>"+
+                                       "VIII. TANDA TANGAN"+
+                                       "<table width='100%' border='0' align='center' cellpadding='3px' cellspacing='0px' class='tbl_form'>"+
+                                          "<tr>"+
+                                              "<td width='50%' border='0'>Tempat : "+rs2.getString("tempat_ttd")+"</td>"+
+                                              "<td width='50%' border='0'>Pasien / keluarga : "+rs2.getString("pasien_keluarga_ttd")+"</td>"+
+                                          "</tr>"+
+                                          "<tr>"+
+                                              "<td width='50%' border='0'>Petugas : "+rs2.getString("nama_petugas")+"</td>"+
+                                              "<td width='50%' border='0'></td>"+
+                                          "</tr>"+
+                                       "</table>"+
+                                    "</td>"+
+                                 "</tr>"
+                            );
+                        }
+                        htmlContent.append(
+                              "</table>"+
+                            "</td>"+
+                          "</tr>");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Notifikasi : "+e);
+                } finally{
+                    if(rs2!=null){
+                        rs2.close();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Notif Asuhan Keperawatan Anak IGD : "+e);
         }
     }
 
