@@ -1,0 +1,19 @@
+{
+  "MySQL": {
+    "EnableIndex": true,
+    "EnableStorage": false,
+    "Host": "localhost",
+    "Port": 3306,
+    "UnixSocket": "/var/run/mysqld/mysqld.sock",
+    "Database": "sik",
+    "Username": "root",
+    "Password": "",
+    "EnableSsl": false,
+    "SslVerifyServerCertificates": true,
+    "SslCACertificates": "",
+    "Lock": false,
+    "MaximumConnectionRetries": 10,
+    "ConnectionRetryInterval": 5,
+    "IndexConnectionsCount": 1
+  }
+}

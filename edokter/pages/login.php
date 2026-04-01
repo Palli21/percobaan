@@ -16,6 +16,14 @@
     <link href="plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css" rel="stylesheet">
     <link href="css/style2.css" rel="stylesheet">
     <link href="css/themes/all-themes.css" rel="stylesheet" />
+    <script>
+        function refreshCaptcha() {
+            var captcha = document.getElementById('ImgCaptcha');
+            if (captcha) {
+                captcha.src = 'pages/captcha.php?_=' + new Date().getTime();
+            }
+        }
+    </script>
 </head>
 
 <body class="login-page">
@@ -45,6 +53,29 @@
                             <span id="MsgIsi2" style="color:#CC0000; font-size:10px;"></span>
                         </div>
                     </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <i class="material-icons">assignment</i>
+                        </span>
+                        <div class="form-line">
+                            <table width="100%" border="0">
+                                <tr>
+                                    <td width="50%" valign="top">
+                                        <img id="ImgCaptcha" width="98%" height="45" src="pages/captcha.php" alt="Captcha" style="border-radius:4px;" />
+                                    </td>
+                                    <td width="50%">
+                                        <input type="text" class="form-control" name="inputcaptcha" placeholder="Masukkan Captcha" pattern="[0-9]{1,6}" title="0-9 (Maksimal 6 karakter)" required onkeydown="setDefault(this, document.getElementById('MsgIsi3'));" id="TxtIsi3" autocomplete="off">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="padding-top:6px;">
+                                        <button class="btn btn-default btn-sm waves-effect" type="button" onclick="refreshCaptcha();">Refresh Captcha</button>
+                                    </td>
+                                </tr>
+                            </table>
+                            <span id="MsgIsi3" style="color:#CC0000; font-size:10px;"></span>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-xs-4">
                             <button class="btn btn-block bg-pink waves-effect" name="BtnLogin" type="submit">LOG IN</button>
@@ -57,17 +88,28 @@
                 <?php 
                     $BtnLogin=isset($_POST['BtnLogin'])?$_POST['BtnLogin']:NULL;
                     if (isset($BtnLogin)) {
-                         $username  = validTeks4($_POST['username'],20);
-                         $password  = validTeks4($_POST['password'],40);
-                         if(getOne2("select count(*) from user where user.id_user=AES_ENCRYPT('$username','nur') and user.password=AES_ENCRYPT('$password','windi')")>0){
-                             if(getOne2("select count(*) from dokter where dokter.kd_dokter='$username'")>0){
-                                $_SESSION["ses_admin"]= encrypt_decrypt($username,"e");
-                                exit(header("Location:index.php"));
+                         $captcha = isset($_POST['inputcaptcha']) ? validTeks4($_POST['inputcaptcha'],6) : '';
+                         if(
+                             isset($_SESSION["Capcay"]) &&
+                             $_SESSION["Capcay"] !== '' &&
+                             $_SESSION["Capcay"] === $captcha
+                         ){
+                             unset($_SESSION['Capcay']);
+                             $username  = validTeks4($_POST['username'],20);
+                             $password  = validTeks4($_POST['password'],40);
+                             if(getOne2("select count(*) from user where user.id_user=AES_ENCRYPT('$username','nur') and user.password=AES_ENCRYPT('$password','windi')")>0){
+                                 if(getOne2("select count(*) from dokter where dokter.kd_dokter='$username'")>0){
+                                    $_SESSION["ses_admin"]= encrypt_decrypt($username,"e");
+                                    exit(header("Location:index.php"));
+                                 }else{
+                                    echo "Username/Password ada yang salah. Silahkan ulangi...!";
+                                 }  
                              }else{
-                                echo "Username/Password ada yang salah. Silahkan ulangi...!";
-                             }  
+                                 echo "Username/Password ada yang salah. Silahkan ulangi...!";
+                             }
                          }else{
-                             echo "Username/Password ada yang salah. Silahkan ulangi...!";
+                             unset($_SESSION['Capcay']);
+                             echo "Captcha tidak sesuai, silahkan ulangi ...!";
                          }
                     }
                 ?>

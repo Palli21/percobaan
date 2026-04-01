@@ -1,0 +1,1 @@
+*/15 * * * * cd /home/pallicks/Simrs/RS2024 && /bin/bash /home/pallicks/Simrs/RS2024/scripts/sync_orthanc_mysql.sh >> /home/pallicks/Simrs/RS2024/logs/sync_orthanc_mysql.log 2>&1

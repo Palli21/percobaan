@@ -13262,16 +13262,19 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
     }
 
     private void aturTampilanSoap() {
-        Color borderColor = new Color(211, 218, 230);
-        Color titleColor = new Color(78, 78, 78);
-        Font titleFont = new Font("Tahoma", Font.PLAIN, 12);
-        Font labelFont = new Font("Open Sans Semibold", Font.PLAIN, 11);
+        Color borderColor = new Color(218, 223, 233);
+        Color titleColor = new Color(102, 108, 118);
+        Color labelColor = new Color(110, 116, 126);
+        Color inputColor = new Color(86, 91, 99);
+        Font titleFont = new Font("SansSerif", Font.PLAIN, 11);
+        Font labelFont = new Font("SansSerif", Font.PLAIN, 11);
+        Font inputFont = new Font("SansSerif", Font.PLAIN, 12);
 
-        aturAreaSoap(scrollPane1, TKeluhan, "Subjektif / Keluhan", 20, 60, 305, 90, borderColor, titleColor, titleFont);
-        aturAreaSoap(scrollPane3, TPenilaian, "Asesmen / Diagnosis", 340, 60, 305, 90, borderColor, titleColor, titleFont);
-        aturAreaSoap(scrollPane7, TInstruksi, "Instruksi", 660, 60, 305, 90, borderColor, titleColor, titleFont);
-        aturAreaSoap(scrollPane2, TPemeriksaan, "Objektif / Pemeriksaan", 20, 180, 305, 90, borderColor, titleColor, titleFont);
-        aturAreaSoap(scrollPane6, TindakLanjut, "Plan / Perencanaan", 340, 180, 305, 90, borderColor, titleColor, titleFont);
+        aturAreaSoap(scrollPane1, TKeluhan, "Subjektif / Keluhan", 20, 60, 305, 90, borderColor, titleColor, titleFont, inputFont, inputColor);
+        aturAreaSoap(scrollPane3, TPenilaian, "Asesmen / Diagnosis", 340, 60, 305, 90, borderColor, titleColor, titleFont, inputFont, inputColor);
+        aturAreaSoap(scrollPane7, TInstruksi, "Instruksi", 660, 60, 305, 90, borderColor, titleColor, titleFont, inputFont, inputColor);
+        aturAreaSoap(scrollPane2, TPemeriksaan, "Objektif / Pemeriksaan", 20, 180, 305, 90, borderColor, titleColor, titleFont, inputFont, inputColor);
+        aturAreaSoap(scrollPane6, TindakLanjut, "Plan / Perencanaan", 340, 180, 305, 90, borderColor, titleColor, titleFont, inputFont, inputColor);
 
         jLabel8.setVisible(false);
         jLabel9.setVisible(false);
@@ -13291,17 +13294,17 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
         jLabel26.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         jLabel26.setBounds(340, 168, 305, 18);
 
-        aturLabelTandaVital(jLabel7, "Suhu (°C) :", labelFont, 660, 180, 62);
-        aturLabelTandaVital(jLabel4, "TD :", labelFont, 806, 180, 28);
-        aturLabelTandaVital(jLabel16, "Berat :", labelFont, 930, 180, 44);
-        aturLabelTandaVital(jLabel17, "TB (Cm) :", labelFont, 660, 210, 62);
-        aturLabelTandaVital(jLabel20, "RR :", labelFont, 806, 210, 28);
-        aturLabelTandaVital(jLabel55, "Nadi :", labelFont, 930, 210, 44);
-        aturLabelTandaVital(jLabel54, "SpO2 (%) :", labelFont, 660, 240, 62);
-        aturLabelTandaVital(jLabel25, "L.P :", labelFont, 806, 240, 28);
-        aturLabelTandaVital(jLabel22, "GCS :", labelFont, 930, 240, 44);
-        aturLabelTandaVital(jLabel29, "Kesadaran :", labelFont, 660, 270, 60);
-        aturLabelTandaVital(jLabel15, "Alergi :", labelFont, 850, 270, 42);
+        aturLabelTandaVital(jLabel7, "Suhu (°C) :", labelFont, labelColor, 660, 180, 62);
+        aturLabelTandaVital(jLabel4, "TD :", labelFont, labelColor, 806, 180, 28);
+        aturLabelTandaVital(jLabel16, "Berat :", labelFont, labelColor, 930, 180, 44);
+        aturLabelTandaVital(jLabel17, "TB (Cm) :", labelFont, labelColor, 660, 210, 62);
+        aturLabelTandaVital(jLabel20, "RR :", labelFont, labelColor, 806, 210, 28);
+        aturLabelTandaVital(jLabel55, "Nadi :", labelFont, labelColor, 930, 210, 44);
+        aturLabelTandaVital(jLabel54, "SpO2 (%) :", labelFont, labelColor, 660, 240, 62);
+        aturLabelTandaVital(jLabel25, "L.P :", labelFont, labelColor, 806, 240, 28);
+        aturLabelTandaVital(jLabel22, "GCS :", labelFont, labelColor, 930, 240, 44);
+        aturLabelTandaVital(jLabel29, "Kesadaran :", labelFont, labelColor, 660, 270, 60);
+        aturLabelTandaVital(jLabel15, "Alergi :", labelFont, labelColor, 850, 270, 42);
 
         TSuhu.setBounds(728, 180, 55, 23);
         TTensi.setBounds(838, 180, 74, 23);
@@ -13315,13 +13318,34 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
         cmbKesadaran.setBounds(720, 270, 123, 23);
         TAlergi.setBounds(898, 270, 188, 23);
 
-        cmbKesadaran.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        TSuhu.setFont(inputFont);
+        TTensi.setFont(inputFont);
+        TBerat.setFont(inputFont);
+        TTinggi.setFont(inputFont);
+        TRespirasi.setFont(inputFont);
+        TNadi.setFont(inputFont);
+        SpO2.setFont(inputFont);
+        LingkarPerut.setFont(inputFont);
+        TGCS.setFont(inputFont);
+        TAlergi.setFont(inputFont);
+        TSuhu.setForeground(inputColor);
+        TTensi.setForeground(inputColor);
+        TBerat.setForeground(inputColor);
+        TTinggi.setForeground(inputColor);
+        TRespirasi.setForeground(inputColor);
+        TNadi.setForeground(inputColor);
+        SpO2.setForeground(inputColor);
+        LingkarPerut.setForeground(inputColor);
+        TGCS.setForeground(inputColor);
+        TAlergi.setForeground(inputColor);
+        cmbKesadaran.setFont(inputFont);
+        cmbKesadaran.setForeground(inputColor);
         panelGlass12.revalidate();
         panelGlass12.repaint();
     }
 
     private void aturAreaSoap(JScrollPane scrollPane, JTextArea textArea, String title, int x, int y, int width, int height,
-            Color borderColor, Color titleColor, Font titleFont) {
+            Color borderColor, Color titleColor, Font titleFont, Font inputFont, Color inputColor) {
         scrollPane.setBounds(x, y, width, height);
         scrollPane.setBorder(BorderFactory.createTitledBorder(new LineBorder(borderColor), title,
                 TitledBorder.LEADING, TitledBorder.TOP, titleFont, titleColor));
@@ -13333,14 +13357,15 @@ private void BtnEditKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_B
 
         textArea.setOpaque(true);
         textArea.setBackground(Color.WHITE);
-        textArea.setForeground(new Color(51, 51, 51));
-        textArea.setFont(new Font("Open Sans Semibold", Font.PLAIN, 12));
+        textArea.setForeground(inputColor);
+        textArea.setFont(inputFont);
         textArea.setMargin(new Insets(6, 6, 6, 6));
     }
 
-    private void aturLabelTandaVital(widget.Label label, String text, Font font, int x, int y, int width) {
+    private void aturLabelTandaVital(widget.Label label, String text, Font font, Color color, int x, int y, int width) {
         label.setText(text);
         label.setFont(font);
+        label.setForeground(color);
         label.setHorizontalAlignment(SwingConstants.LEFT);
         label.setBounds(x, y, width, 23);
     }

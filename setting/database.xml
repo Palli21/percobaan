@@ -128,11 +128,11 @@
     <entry key="IDCORONA">l4nh5eVYrLAER/I2A4b3Tw==</entry>
     <entry key="PASSCORONA">l4nh5eVYrLAER/I2A4b3Tw==</entry>
     
-    <entry key="CLIENTIDSATUSEHAT">53X+pVsbKuqZ+5+c23wCirsKQbuotPryBO/OVTH4i2qHGfQXSutCslSlZEDzBEJHYdSA9Agbj7TT5PeNdUhRPw==</entry>
-    <entry key="SECRETKEYSATUSEHAT">1CklUmxNO8wxNdAcdoTO9jvlusUCEK0oPEXFusG3sBEyKut50qC5jrz+q8td5437/Sljaob2nSQg0jWMiQWooqUHbXR5wSdVBv0qxQCizpo=</entry>
+    <entry key="CLIENTIDSATUSEHAT">2THkhgvmdd+Gqbw18/tWQyJnYrNzte2sV4AIdiyNi/ETd+YIJxd7vGo0x/DfE3m58IuRRUyAX7blSGwJZw8/OQ==</entry>
+    <entry key="SECRETKEYSATUSEHAT">MtYfRAm1B4JXPcENsx62x1XELBfMnRoeuEC8gN5Rdjz8OmroIdlAX0sbi5U7L6Rrx7FKCrzOG51cogSAGeVUPYh0zIYWTADoWwPnSfscxl8=</entry>
     <entry key="URLAUTHSATUSEHAT">https://api-satusehat.kemkes.go.id/oauth2/v1</entry>
     <entry key="URLFHIRSATUSEHAT">https://api-satusehat.kemkes.go.id/fhir-r4/v1</entry>
-    <entry key="IDSATUSEHAT">mzzJNnWXZJo1wADoDUSy0oyQAKwB9mzDoePvGQwllZQsv</entry>
+    <entry key="IDSATUSEHAT">3zsRCI5bX555hndB8kDAsQ==</entry>
     <entry key="KELURAHANSATUSEHAT">7315062012</entry>
     <entry key="KECAMATANSATUSEHAT">731506</entry>
     <entry key="KABUPATENSATUSEHAT">7315</entry>
@@ -222,7 +222,7 @@
     <entry key="USERADAMLAB">disesuaikan</entry>
     <entry key="PASADAMLAB">disesuaikan</entry>
     
-    <entry key="URLORTHANC">http://192.168.10.22</entry>
+    <entry key="URLORTHANC">http://100.94.11.123</entry>
     <entry key="PORTORTHANC">gie5pRePkRsFe+dOh84P4A==</entry>
     <entry key="USERORTHANC">V9bi0P2HgAq8Nn8lUyS6/A==</entry>
     <entry key="PASSORTHANC">V9bi0P2HgAq8Nn8lUyS6/A==</entry>

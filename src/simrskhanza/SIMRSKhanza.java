@@ -27,7 +27,7 @@ public class SIMRSKhanza {
     public static void main(String[] args) {
         // Mengatur FlatLaf Look and Feel
         try {
-         FlatLightLaf.setup();
+        FlatLightLaf.setup();
 //       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); // look & feel default
         } catch (Exception ex) {
             System.err.println("Failed to initialize LaF");

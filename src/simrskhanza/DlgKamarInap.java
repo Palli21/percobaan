@@ -139,7 +139,7 @@ import rekammedis.RMPenilaianAwalKeperawatanRanapAnak;
 import rekammedis.RMPenilaianAwalKeperawatanRanapNeonatus;
 import rekammedis.RMPenilaianAwalMedisHemodialisa;
 import rekammedis.RMPenilaianAwalMedisRanapAnak;
-import rekammedis.RMPenilaianAwalMedisRanapDewasa;
+import rekammedis.AsesmenAwalRawatInapMedis;
 import rekammedis.RMPenilaianAwalMedisRanapICU;
 import rekammedis.RMPenilaianAwalMedisRanapKandungan;
 import rekammedis.RMPenilaianAwalPerina;
@@ -12430,7 +12430,7 @@ private void MnRujukMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         }else{
             if(tbKamIn.getSelectedRow()>-1){
                 this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                RMPenilaianAwalMedisRanapDewasa form=new RMPenilaianAwalMedisRanapDewasa(null,false);
+                AsesmenAwalRawatInapMedis form=new AsesmenAwalRawatInapMedis(null,false);
                 form.isCek();
                 form.emptTeks();
                 if(R1.isSelected()==true){

@@ -1452,7 +1452,7 @@ public class koneksiDB {
         }catch(Exception e){
             var=""; 
         }
-        return var;
+        return var==null?"":var;
     }
     
     public static String SECRETKEYSATUSEHAT(){
@@ -1462,7 +1462,7 @@ public class koneksiDB {
         }catch(Exception e){
             var=""; 
         }
-        return var;
+        return var==null?"":var;
     }
     
     public static String IDSATUSEHAT(){
@@ -1472,7 +1472,7 @@ public class koneksiDB {
         }catch(Exception e){
             var=""; 
         }
-        return var;
+        return var==null?"":var;
     }
     
     public static String URLAUTHSATUSEHAT(){
@@ -1482,7 +1482,7 @@ public class koneksiDB {
         }catch(Exception e){
             var=""; 
         }
-        return var;
+        return var==null?"":var;
     }
     
     public static String URLFHIRSATUSEHAT(){
@@ -1492,7 +1492,7 @@ public class koneksiDB {
         }catch(Exception e){
             var=""; 
         }
-        return var;
+        return var==null?"":var;
     }
     
     public static String KELURAHANSATUSEHAT(){

@@ -14,6 +14,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 /**
  *
@@ -63,6 +65,33 @@ public class SatuSehatCekNIK {
         } catch (Exception e) {
             System.out.println("Notif : "+e);
         } 
+    }
+
+    private boolean kosong(String nilai){
+        return nilai==null || nilai.trim().isEmpty();
+    }
+
+    private String ambilTokenSatuSehat(String konteks){
+        String token = api.TokenSatuSehat();
+        if(kosong(token)){
+            System.out.println("Notifikasi SatuSehat : Token kosong/gagal didapatkan saat "+konteks);
+        }
+        return token;
+    }
+
+    private boolean siapkanRequestSatuSehat(String token, String konteks){
+        if(kosong(link)){
+            System.out.println("Notifikasi SatuSehat : URLFHIRSATUSEHAT kosong saat "+konteks);
+            return false;
+        }
+        if(kosong(token)){
+            return false;
+        }
+        headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Authorization", "Bearer "+token);
+        requestEntity = new HttpEntity(headers);
+        return true;
     }
     
     public void tampil(String cari) {
@@ -248,10 +277,10 @@ public class SatuSehatCekNIK {
     public String tampilIDPasien(String cari) {
         idpasien="";
         try{
-            headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.add("Authorization", "Bearer "+api.TokenSatuSehat());
-            requestEntity = new HttpEntity(headers);
+            String token = ambilTokenSatuSehat("pencarian pasien SATUSEHAT NIK "+cari);
+            if(!siapkanRequestSatuSehat(token,"pencarian pasien SATUSEHAT NIK "+cari)){
+                return idpasien;
+            }
             System.out.println("URL : "+link+"/Patient?identifier=https://fhir.kemkes.go.id/id/nik|"+cari);
             json=api.getRest().exchange(link+"/Patient?identifier=https://fhir.kemkes.go.id/id/nik|"+cari, HttpMethod.GET, requestEntity, String.class).getBody();
             System.out.println("JSON : "+json);
@@ -259,6 +288,11 @@ public class SatuSehatCekNIK {
             for(JsonNode list:root.path("entry")){
                 idpasien=list.path("resource").path("id").asText();
             }
+        }catch(HttpClientErrorException | HttpServerErrorException e){
+            idpasien="";
+            System.out.println("Notifikasi SATUSEHAT pasien : "+e.getStatusCode());
+            System.out.println("URL : "+link+"/Patient?identifier=https://fhir.kemkes.go.id/id/nik|"+cari);
+            System.out.println("Response SATUSEHAT pasien : "+e.getResponseBodyAsString());
         }catch(Exception e){
             idpasien="";
             System.out.println("Notifikasi : "+e);
@@ -269,10 +303,10 @@ public class SatuSehatCekNIK {
     public String tampilIDParktisi(String cari) {
         idpasien="";
         try{
-            headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.add("Authorization", "Bearer "+api.TokenSatuSehat());
-            requestEntity = new HttpEntity(headers);
+            String token = ambilTokenSatuSehat("pencarian praktisi SATUSEHAT NIK "+cari);
+            if(!siapkanRequestSatuSehat(token,"pencarian praktisi SATUSEHAT NIK "+cari)){
+                return idpasien;
+            }
             System.out.println("URL : "+link+"/Practitioner?identifier=https://fhir.kemkes.go.id/id/nik|"+cari);
             json=api.getRest().exchange(link+"/Practitioner?identifier=https://fhir.kemkes.go.id/id/nik|"+cari, HttpMethod.GET, requestEntity, String.class).getBody();
             System.out.println("JSON : "+json);
@@ -281,6 +315,11 @@ public class SatuSehatCekNIK {
             for(JsonNode list:response){
                idpasien=list.path("resource").path("id").asText();
             }
+        }catch(HttpClientErrorException | HttpServerErrorException e){
+            idpasien="";
+            System.out.println("Notifikasi SATUSEHAT praktisi : "+e.getStatusCode());
+            System.out.println("URL : "+link+"/Practitioner?identifier=https://fhir.kemkes.go.id/id/nik|"+cari);
+            System.out.println("Response SATUSEHAT praktisi : "+e.getResponseBodyAsString());
         }catch(Exception e){
             idpasien="";
             System.out.println("Notifikasi : "+e);

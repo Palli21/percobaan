@@ -7,6 +7,8 @@ package khanzahmsservicesatusehat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import fungsi.ApiSatuSehat;
 import fungsi.SatuSehatCekNIK;
 import fungsi.koneksiDB;
@@ -17,13 +19,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.Calendar;
 import java.util.Date;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 /**
  *
@@ -83,6 +92,7 @@ public class frmUtama extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         Tanggal2 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -112,6 +122,14 @@ public class frmUtama extends javax.swing.JFrame {
         jLabel2.setPreferredSize(new java.awt.Dimension(30, 23));
         jPanel1.add(jLabel2);
 
+        jButton2.setText("ImagingStudy");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton2);
+
         jButton1.setText("Keluar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -128,6 +146,10 @@ public class frmUtama extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         System.exit(0);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        jalankanImagingStudyManual();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -170,12 +192,56 @@ public class frmUtama extends javax.swing.JFrame {
     private javax.swing.JTextField Tanggal2;
     private javax.swing.JTextArea TeksArea;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
+
+    private void jalankanImagingStudyManual(){
+        if(!jButton2.isEnabled()){
+            return;
+        }
+        setManualImagingStudyBusy(true);
+        appendLog("Memulai proses manual ImagingStudy...\n");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    imagingstudy();
+                    appendLog("Proses manual ImagingStudy selesai.\n");
+                } catch (Exception e) {
+                    System.out.println("Notifikasi : "+e);
+                    appendLog("Proses manual ImagingStudy gagal : "+e+"\n");
+                } finally {
+                    setManualImagingStudyBusy(false);
+                }
+            }
+        },"manual-imagingstudy").start();
+    }
+
+    private void setManualImagingStudyBusy(final boolean busy){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                jButton2.setEnabled(!busy);
+                jButton2.setText(busy?"Memproses...":"ImagingStudy");
+            }
+        });
+    }
+
+    private void appendLog(final String text){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                TeksArea.append(text);
+                TeksArea.setCaretPosition(TeksArea.getDocument().getLength());
+            }
+        });
+    }
+
     private void jam(){
         ActionListener taskPerformer = new ActionListener(){
             private int nilai_jam;
@@ -223,6 +289,7 @@ public class frmUtama extends javax.swing.JFrame {
                     prosedur();
                     condition();
                     clinicalimpression();
+                    imagingstudy();
                 }
             }
         };
@@ -3243,5 +3310,373 @@ public class frmUtama extends javax.swing.JFrame {
         }catch(Exception e){
             System.out.println("Notifikasi : "+e);
         }
+    }
+
+    private void imagingstudy(){
+        PreparedStatement psImaging=null;
+        PreparedStatement psSimpan=null;
+        ResultSet rsImaging=null;
+        String token="",idorganisasi="";
+        LinkedHashMap<String,ImagingStudyDraft> daftarStudy=new LinkedHashMap<String,ImagingStudyDraft>();
+        try{
+            psImaging=koneksi.prepareStatement(
+                   "select permintaan_radiologi.noorder,permintaan_pemeriksaan_radiologi.kd_jenis_prw,jns_perawatan_radiologi.nm_perawatan,"+
+                   "ifnull(satu_sehat_servicerequest_radiologi.id_servicerequest,'') as id_servicerequest,"+
+                   "reg_periksa.no_rkm_medis,pasien.no_ktp,pasien.nm_pasien,satu_sehat_encounter.id_encounter,"+
+                   "permintaan_radiologi.tgl_permintaan,if(permintaan_radiologi.jam_permintaan='00:00:00','',permintaan_radiologi.jam_permintaan) as jam_permintaan,"+
+                   "if(permintaan_radiologi.tgl_hasil='0000-00-00','',permintaan_radiologi.tgl_hasil) as tgl_hasil,"+
+                   "if(permintaan_radiologi.jam_hasil='00:00:00','',permintaan_radiologi.jam_hasil) as jam_hasil,"+
+                   "study_orthanc.study_uid,study_orthanc.tanggal as study_date,ifnull(study_orthanc.description,'') as study_description,"+
+                   "ifnull(study_orthanc.institution,'') as institution,series_orthanc.series_uid,ifnull(series_orthanc.modality,'') as modality,"+
+                   "ifnull(series_orthanc.body_part,'') as body_part,ifnull(series_orthanc.station_name,'') as station_name,"+
+                   "instance_orthanc.sop_uid,ifnull(instance_orthanc.sop_class,'') as sop_class "+
+                   "from reg_periksa inner join pasien on pasien.no_rkm_medis=reg_periksa.no_rkm_medis "+
+                   "inner join permintaan_radiologi on permintaan_radiologi.no_rawat=reg_periksa.no_rawat "+
+                   "inner join permintaan_pemeriksaan_radiologi on permintaan_pemeriksaan_radiologi.noorder=permintaan_radiologi.noorder "+
+                   "inner join jns_perawatan_radiologi on jns_perawatan_radiologi.kd_jenis_prw=permintaan_pemeriksaan_radiologi.kd_jenis_prw "+
+                   "inner join satu_sehat_encounter on satu_sehat_encounter.no_rawat=reg_periksa.no_rawat "+
+                   "inner join satu_sehat_servicerequest_radiologi on satu_sehat_servicerequest_radiologi.noorder=permintaan_pemeriksaan_radiologi.noorder "+
+                   "and satu_sehat_servicerequest_radiologi.kd_jenis_prw=permintaan_pemeriksaan_radiologi.kd_jenis_prw "+
+                   "inner join study_orthanc on study_orthanc.patient_id=reg_periksa.no_rkm_medis "+
+                   "and study_orthanc.tanggal between subdate(if(permintaan_radiologi.tgl_hasil='0000-00-00',permintaan_radiologi.tgl_permintaan,permintaan_radiologi.tgl_hasil),interval 7 day) "+
+                   "and adddate(if(permintaan_radiologi.tgl_hasil='0000-00-00',permintaan_radiologi.tgl_permintaan,permintaan_radiologi.tgl_hasil),interval 7 day) "+
+                   "inner join series_orthanc on series_orthanc.study_uid=study_orthanc.study_uid "+
+                   "inner join instance_orthanc on instance_orthanc.series_uid=series_orthanc.series_uid "+
+                   "left join satu_sehat_imagingstudy_radiologi on satu_sehat_imagingstudy_radiologi.noorder=permintaan_radiologi.noorder "+
+                   "and satu_sehat_imagingstudy_radiologi.kd_jenis_prw=permintaan_pemeriksaan_radiologi.kd_jenis_prw "+
+                   "and satu_sehat_imagingstudy_radiologi.study_uid=study_orthanc.study_uid "+
+                   "where ifnull(satu_sehat_servicerequest_radiologi.id_servicerequest,'')<>'' "+
+                   "and ifnull(study_orthanc.study_uid,'')<>'' and ifnull(series_orthanc.series_uid,'')<>'' and ifnull(instance_orthanc.sop_uid,'')<>'' "+
+                   "and ifnull(satu_sehat_imagingstudy_radiologi.id_imagingstudy,'')='' "+
+                   "and if(permintaan_radiologi.tgl_hasil='0000-00-00',permintaan_radiologi.tgl_permintaan,permintaan_radiologi.tgl_hasil) between ? and ? "+
+                   "order by permintaan_radiologi.noorder,permintaan_pemeriksaan_radiologi.kd_jenis_prw,study_orthanc.study_uid,series_orthanc.series_uid,instance_orthanc.sop_uid");
+            try {
+                psImaging.setString(1,Tanggal1.getText());
+                psImaging.setString(2,Tanggal2.getText());
+                rsImaging=psImaging.executeQuery();
+                while(rsImaging.next()){
+                    String kunci=rsImaging.getString("noorder")+"|"+rsImaging.getString("kd_jenis_prw")+"|"+rsImaging.getString("study_uid");
+                    ImagingStudyDraft study=daftarStudy.get(kunci);
+                    if(study==null){
+                        study=new ImagingStudyDraft();
+                        study.noorder=rsImaging.getString("noorder");
+                        study.kdJenisPrw=rsImaging.getString("kd_jenis_prw");
+                        study.nmPerawatan=kosongJadi(rsImaging.getString("nm_perawatan"));
+                        study.idServiceRequest=kosongJadi(rsImaging.getString("id_servicerequest"));
+                        study.noRm=kosongJadi(rsImaging.getString("no_rkm_medis"));
+                        study.noKtp=kosongJadi(rsImaging.getString("no_ktp"));
+                        study.nmPasien=kosongJadi(rsImaging.getString("nm_pasien"));
+                        study.idEncounter=kosongJadi(rsImaging.getString("id_encounter"));
+                        study.tglPermintaan=kosongJadi(rsImaging.getString("tgl_permintaan"));
+                        study.jamPermintaan=kosongJadi(rsImaging.getString("jam_permintaan"));
+                        study.tglHasil=kosongJadi(rsImaging.getString("tgl_hasil"));
+                        study.jamHasil=kosongJadi(rsImaging.getString("jam_hasil"));
+                        study.studyUid=kosongJadi(rsImaging.getString("study_uid"));
+                        study.studyDate=kosongJadi(rsImaging.getString("study_date"));
+                        study.studyDescription=kosongJadi(rsImaging.getString("study_description"));
+                        study.institution=kosongJadi(rsImaging.getString("institution"));
+                        daftarStudy.put(kunci,study);
+                    }
+                    ImagingSeriesDraft series=study.seriesMap.get(rsImaging.getString("series_uid"));
+                    if(series==null){
+                        series=new ImagingSeriesDraft();
+                        series.seriesUid=kosongJadi(rsImaging.getString("series_uid"));
+                        series.modality=kosongJadi(rsImaging.getString("modality"));
+                        series.bodyPart=kosongJadi(rsImaging.getString("body_part"));
+                        series.stationName=kosongJadi(rsImaging.getString("station_name"));
+                        study.seriesMap.put(series.seriesUid,series);
+                    }
+                    if(!series.instanceMap.containsKey(rsImaging.getString("sop_uid"))){
+                        ImagingInstanceDraft instance=new ImagingInstanceDraft();
+                        instance.sopUid=kosongJadi(rsImaging.getString("sop_uid"));
+                        instance.sopClass=kosongJadi(rsImaging.getString("sop_class"));
+                        series.instanceMap.put(instance.sopUid,instance);
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Notif : "+e);
+            }
+
+            if(daftarStudy.isEmpty()){
+                return;
+            }
+
+            idorganisasi=koneksiDB.IDSATUSEHAT();
+            token=api.TokenSatuSehat();
+            if(kosong(idorganisasi)||kosong(token)){
+                appendLog("ImagingStudy dilewati, referensi SATUSEHAT belum siap.\n");
+                return;
+            }
+
+            psSimpan=koneksi.prepareStatement(
+                    "insert into satu_sehat_imagingstudy_radiologi(noorder,kd_jenis_prw,id_servicerequest,study_uid,id_imagingstudy) "+
+                    "values(?,?,?,?,?) on duplicate key update id_servicerequest=values(id_servicerequest),id_imagingstudy=values(id_imagingstudy)");
+
+            for(Map.Entry<String,ImagingStudyDraft> entri : daftarStudy.entrySet()){
+                ImagingStudyDraft study=entri.getValue();
+                if(kosong(study.noKtp)){
+                    appendLog("ImagingStudy dilewati, NIK pasien kosong untuk order "+study.noorder+".\n");
+                    continue;
+                }
+                if(kosong(study.idServiceRequest)||kosong(study.idEncounter)){
+                    appendLog("ImagingStudy dilewati, referensi ServiceRequest/Encounter belum lengkap untuk order "+study.noorder+".\n");
+                    continue;
+                }
+
+                idpasien=cekViaSatuSehat.tampilIDPasien(study.noKtp);
+                if(kosong(idpasien)){
+                    appendLog("ImagingStudy dilewati, pasien SATUSEHAT tidak ditemukan untuk NIK "+study.noKtp+".\n");
+                    continue;
+                }
+
+                try{
+                    headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                    headers.add("Authorization", "Bearer "+token);
+
+                    ObjectNode rootImaging=mapper.createObjectNode();
+                    ArrayNode identifierArray=mapper.createArrayNode();
+                    ObjectNode identifier=mapper.createObjectNode();
+                    ArrayNode basedOnArray=mapper.createArrayNode();
+                    ObjectNode basedOn=mapper.createObjectNode();
+                    ObjectNode subject=mapper.createObjectNode();
+                    ObjectNode encounter=mapper.createObjectNode();
+                    ArrayNode modalityArray=mapper.createArrayNode();
+                    Set<String> modalityUnik=new LinkedHashSet<String>();
+                    int nomorSeries=1;
+                    int totalInstance=0;
+
+                    rootImaging.put("resourceType","ImagingStudy");
+                    rootImaging.put("status","available");
+
+                    identifier.put("system","http://sys-ids.kemkes.go.id/imagingstudy/"+idorganisasi);
+                    identifier.put("value",study.noorder+"-"+study.kdJenisPrw+"-"+study.studyUid);
+                    identifierArray.add(identifier);
+                    rootImaging.set("identifier",identifierArray);
+
+                    subject.put("reference","Patient/"+idpasien);
+                    if(!kosong(study.nmPasien)){
+                        subject.put("display",study.nmPasien);
+                    }
+                    rootImaging.set("subject",subject);
+
+                    encounter.put("reference","Encounter/"+study.idEncounter);
+                    rootImaging.set("encounter",encounter);
+
+                    basedOn.put("reference","ServiceRequest/"+study.idServiceRequest);
+                    basedOn.put("display",kosong(study.studyDescription)?study.nmPerawatan:study.studyDescription);
+                    basedOnArray.add(basedOn);
+                    rootImaging.set("basedOn",basedOnArray);
+
+                    if(!kosong(study.studyDescription)){
+                        rootImaging.put("description",study.studyDescription);
+                    }else if(!kosong(study.nmPerawatan)){
+                        rootImaging.put("description",study.nmPerawatan);
+                    }
+
+                    rootImaging.put("started",gabungTanggalJam(study.studyDate,study.tglHasil,study.jamHasil,study.tglPermintaan,study.jamPermintaan));
+
+                    ArrayNode seriesArray=mapper.createArrayNode();
+                    for(Map.Entry<String,ImagingSeriesDraft> entriSeries : study.seriesMap.entrySet()){
+                        ImagingSeriesDraft series=entriSeries.getValue();
+                        String modalityCode=kosong(series.modality)?"OT":series.modality;
+                        totalInstance=totalInstance+series.instanceMap.size();
+                        if(modalityUnik.add(modalityCode)){
+                            ObjectNode modalityNode=mapper.createObjectNode();
+                            ArrayNode codingModality=mapper.createArrayNode();
+                            ObjectNode coding=mapper.createObjectNode();
+                            coding.put("system","http://dicom.nema.org/resources/ontology/DCM");
+                            coding.put("code",modalityCode);
+                            coding.put("display",getModalityDisplay(modalityCode));
+                            codingModality.add(coding);
+                            modalityNode.set("coding",codingModality);
+                            modalityNode.put("text",getModalityDisplay(modalityCode));
+                            modalityArray.add(modalityNode);
+                        }
+
+                        ObjectNode seriesNode=mapper.createObjectNode();
+                        seriesNode.put("uid",series.seriesUid);
+                        seriesNode.put("number",nomorSeries++);
+                        ObjectNode modalitySeries=mapper.createObjectNode();
+                        modalitySeries.put("system","http://dicom.nema.org/resources/ontology/DCM");
+                        modalitySeries.put("code",modalityCode);
+                        modalitySeries.put("display",getModalityDisplay(modalityCode));
+                        seriesNode.set("modality",modalitySeries);
+                        if(!kosong(series.bodyPart)){
+                            ObjectNode bodySite=mapper.createObjectNode();
+                            bodySite.put("text",series.bodyPart);
+                            seriesNode.set("bodySite",bodySite);
+                        }
+                        if(!kosong(series.stationName)){
+                            seriesNode.put("description",series.stationName);
+                        }else if(!kosong(study.nmPerawatan)){
+                            seriesNode.put("description",study.nmPerawatan);
+                        }
+                        seriesNode.put("numberOfInstances",series.instanceMap.size());
+
+                        ArrayNode instanceArray=mapper.createArrayNode();
+                        int nomorInstance=1;
+                        for(Map.Entry<String,ImagingInstanceDraft> entriInstance : series.instanceMap.entrySet()){
+                            ImagingInstanceDraft instance=entriInstance.getValue();
+                            ObjectNode instanceNode=mapper.createObjectNode();
+                            ObjectNode sopClass=mapper.createObjectNode();
+                            String sopClassCode=kosong(instance.sopClass)?"1.2.840.10008.5.1.4.1.1.7":instance.sopClass;
+                            instanceNode.put("uid",instance.sopUid);
+                            instanceNode.put("number",nomorInstance++);
+                            sopClass.put("system","urn:ietf:rfc:3986");
+                            sopClass.put("code",sopClassCode);
+                            sopClass.put("display",getSopClassDisplay(sopClassCode));
+                            instanceNode.set("sopClass",sopClass);
+                            instanceArray.add(instanceNode);
+                        }
+                        seriesNode.set("instance",instanceArray);
+                        seriesArray.add(seriesNode);
+                    }
+                    rootImaging.set("modality",modalityArray);
+                    rootImaging.put("numberOfSeries",study.seriesMap.size());
+                    rootImaging.put("numberOfInstances",totalInstance);
+                    rootImaging.set("series",seriesArray);
+
+                    json=mapper.writeValueAsString(rootImaging);
+                    appendLog("URL : "+link+"/ImagingStudy"+"\n");
+                    appendLog("Request JSON : "+json+"\n");
+                    requestEntity = new HttpEntity(json,headers);
+                    json=api.getRest().exchange(link+"/ImagingStudy", HttpMethod.POST, requestEntity, String.class).getBody();
+                    appendLog("Result JSON : "+json+"\n");
+                    root = mapper.readTree(json);
+                    response = root.path("id");
+                    if(!response.asText().equals("")){
+                        psSimpan.setString(1,study.noorder);
+                        psSimpan.setString(2,study.kdJenisPrw);
+                        psSimpan.setString(3,study.idServiceRequest);
+                        psSimpan.setString(4,study.studyUid);
+                        psSimpan.setString(5,response.asText());
+                        psSimpan.executeUpdate();
+                    }
+                }catch(HttpClientErrorException | HttpServerErrorException e){
+                    System.out.println("Notifikasi Bridging : "+e.getStatusCode());
+                    System.out.println("Response Bridging : "+e.getResponseBodyAsString());
+                    appendLog("ImagingStudy gagal untuk order "+study.noorder+" : "+e.getStatusCode()+"\n");
+                }catch(Exception e){
+                    System.out.println("Notifikasi Bridging : "+e);
+                    appendLog("ImagingStudy gagal untuk order "+study.noorder+" : "+e+"\n");
+                }
+            }
+        }catch(Exception e){
+            System.out.println("Notifikasi : "+e);
+        } finally{
+            try {
+                if(rsImaging!=null){
+                    rsImaging.close();
+                }
+                if(psImaging!=null){
+                    psImaging.close();
+                }
+                if(psSimpan!=null){
+                    psSimpan.close();
+                }
+            } catch (Exception e) {
+                System.out.println("Notif : "+e);
+            }
+        }
+    }
+
+    private boolean kosong(String nilai){
+        return nilai==null || nilai.trim().equals("");
+    }
+
+    private String kosongJadi(String nilai){
+        return nilai==null?"":nilai.trim();
+    }
+
+    private String gabungTanggalJam(String studyDate,String tglHasil,String jamHasil,String tglPermintaan,String jamPermintaan){
+        String tanggal=kosong(studyDate)?(kosong(tglHasil)?tglPermintaan:tglHasil):studyDate;
+        String jamPakai=kosong(jamHasil)?(kosong(jamPermintaan)?"00:00:00":jamPermintaan):jamHasil;
+        return tanggal+"T"+jamPakai+"+07:00";
+    }
+
+    private String getModalityDisplay(String code){
+        if(code==null){
+            return "Other";
+        }
+        if(code.equals("CR")){
+            return "Computed Radiography";
+        }else if(code.equals("CT")){
+            return "Computed Tomography";
+        }else if(code.equals("DX")){
+            return "Digital Radiography";
+        }else if(code.equals("MR")){
+            return "Magnetic Resonance Imaging";
+        }else if(code.equals("MG")){
+            return "Mammography";
+        }else if(code.equals("NM")){
+            return "Nuclear Medicine";
+        }else if(code.equals("OT")){
+            return "Other";
+        }else if(code.equals("PT")){
+            return "Positron Emission Tomography";
+        }else if(code.equals("RF")){
+            return "Radiofluoroscopy";
+        }else if(code.equals("US")){
+            return "Ultrasound";
+        }else if(code.equals("XA")){
+            return "X-Ray Angiography";
+        }
+        return code;
+    }
+
+    private String getSopClassDisplay(String code){
+        if(code==null){
+            return "DICOM SOP Class";
+        }
+        if(code.equals("1.2.840.10008.5.1.4.1.1.1")){
+            return "Computed Radiography Image Storage";
+        }else if(code.equals("1.2.840.10008.5.1.4.1.1.1.1")){
+            return "Digital X-Ray Image Storage - For Presentation";
+        }else if(code.equals("1.2.840.10008.5.1.4.1.1.1.1.1")){
+            return "Digital X-Ray Image Storage - For Processing";
+        }else if(code.equals("1.2.840.10008.5.1.4.1.1.2")){
+            return "CT Image Storage";
+        }else if(code.equals("1.2.840.10008.5.1.4.1.1.4")){
+            return "MR Image Storage";
+        }else if(code.equals("1.2.840.10008.5.1.4.1.1.6.1")){
+            return "Ultrasound Image Storage";
+        }else if(code.equals("1.2.840.10008.5.1.4.1.1.7")){
+            return "Secondary Capture Image Storage";
+        }
+        return "DICOM SOP Class";
+    }
+
+    private static class ImagingStudyDraft {
+        private String noorder="";
+        private String kdJenisPrw="";
+        private String nmPerawatan="";
+        private String idServiceRequest="";
+        private String noRm="";
+        private String noKtp="";
+        private String nmPasien="";
+        private String idEncounter="";
+        private String tglPermintaan="";
+        private String jamPermintaan="";
+        private String tglHasil="";
+        private String jamHasil="";
+        private String studyUid="";
+        private String studyDate="";
+        private String studyDescription="";
+        private String institution="";
+        private LinkedHashMap<String,ImagingSeriesDraft> seriesMap=new LinkedHashMap<String,ImagingSeriesDraft>();
+    }
+
+    private static class ImagingSeriesDraft {
+        private String seriesUid="";
+        private String modality="";
+        private String bodyPart="";
+        private String stationName="";
+        private LinkedHashMap<String,ImagingInstanceDraft> instanceMap=new LinkedHashMap<String,ImagingInstanceDraft>();
+    }
+
+    private static class ImagingInstanceDraft {
+        private String sopUid="";
+        private String sopClass="";
     }
 }

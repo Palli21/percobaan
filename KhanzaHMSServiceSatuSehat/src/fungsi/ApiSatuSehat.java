@@ -22,6 +22,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 public class ApiSatuSehat {        
@@ -47,14 +49,30 @@ public class ApiSatuSehat {
         }
     }
 
+    private boolean kosong(String nilai){
+        return nilai==null || nilai.trim().isEmpty();
+    }
+
     public String TokenSatuSehat(){
+        token="";
+        if(kosong(clientid) || kosong(key) || kosong(urlauth)){
+            System.out.println("Notifikasi Auth SatuSehat : konfigurasi CLIENTIDSATUSEHAT, SECRETKEYSATUSEHAT, atau URLAUTHSATUSEHAT belum lengkap");
+            return token;
+        }
         try {    
             header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            requestEntity = new HttpEntity("client_id="+clientid+"&client_secret="+key,header);
-            root = mapper.readTree(getRest().exchange(urlauth+"/accesstoken?grant_type=client_credentials", HttpMethod.POST, requestEntity, String.class).getBody());
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("client_id",clientid.trim());
+            form.add("client_secret",key.trim());
+            requestEntity = new HttpEntity(form,header);
+            root = mapper.readTree(getRest().exchange(urlauth.trim()+"/accesstoken?grant_type=client_credentials", HttpMethod.POST, requestEntity, String.class).getBody());
             token=root.path("access_token").asText();
+            if(kosong(token)){
+                System.out.println("Notifikasi Auth SatuSehat : access_token kosong dari "+urlauth.trim());
+            }
         } catch (Exception ex) {
+            token="";
             System.out.println("Notifikasi : "+ex);
         }
         return token;
